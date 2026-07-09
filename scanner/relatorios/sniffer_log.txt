@@ -152,3 +152,5 @@
 [ALERTA] Tráfego detectado: 192.168.250.223 -> 192.168.0.10
 [ALERTA] Tráfego detectado: 192.168.250.223 -> 192.168.0.10
 [ALERTA] Tráfego detectado: 192.168.250.223 -> 192.168.0.10
+[ALERTA] Tráfego detectado: 192.168.0.84 -> 239.255.255.250
+[ALERTA] Tráfego detectado: 192.168.0.84 -> 239.255.255.250
