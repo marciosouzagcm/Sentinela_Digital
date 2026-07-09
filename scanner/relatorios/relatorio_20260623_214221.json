@@ -1,0 +1,28 @@
+{
+  "alvo": "http://192.168.0.10",
+  "gerado_em": "2026-06-23T21:42:21.882910",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 0,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-WEB-HTTP",
+        "categoria": "A02",
+        "titulo": "Aplicação servida em HTTP puro",
+        "descricao": "Tráfego sem TLS expõe credenciais e dados em trânsito.",
+        "ativo": "http://192.168.0.10",
+        "severidade": "ALTA",
+        "evidencia": "Esquema http://",
+        "mitigacao": "Forçar HTTPS e redirecionar 301 do HTTP para HTTPS.",
+        "descoberta_em": "2026-06-23T21:41:53.102674",
+        "corrigida": false
+      }
+    ]
+  }
+}

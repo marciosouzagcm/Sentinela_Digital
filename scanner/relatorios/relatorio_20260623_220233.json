@@ -1,0 +1,66 @@
+{
+  "alvo": "192.168.0.10",
+  "gerado_em": "2026-06-23T22:02:33.916389",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 1,
+    "ALTA": 3,
+    "MEDIA": 0,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A03": [
+      {
+        "identificador": "A03-COD-0004",
+        "categoria": "A03",
+        "titulo": "Injeção SQL (concatenação ou f-string)",
+        "descricao": "Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:11.",
+        "ativo": "/home/marciosouza/scanner/testes_código/teste_inseguro.py:11",
+        "severidade": "CRITICA",
+        "evidencia": "query = f\"SELECT * FROM users WHERE id = {entrada}\"",
+        "mitigacao": "Usar consultas parametrizadas ou ORM.",
+        "descoberta_em": "2026-06-23T22:02:33.916040",
+        "corrigida": false
+      },
+      {
+        "identificador": "A03-COD-0002",
+        "categoria": "A03",
+        "titulo": "Uso de eval() detectado",
+        "descricao": "Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:6.",
+        "ativo": "/home/marciosouza/scanner/testes_código/teste_inseguro.py:6",
+        "severidade": "ALTA",
+        "evidencia": "# Regra 2: Uso de eval()",
+        "mitigacao": "Evitar eval; usar parsers seguros ou sandboxes.",
+        "descoberta_em": "2026-06-23T22:02:33.916010",
+        "corrigida": false
+      },
+      {
+        "identificador": "A03-COD-0003",
+        "categoria": "A03",
+        "titulo": "Uso de eval() detectado",
+        "descricao": "Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:8.",
+        "ativo": "/home/marciosouza/scanner/testes_código/teste_inseguro.py:8",
+        "severidade": "ALTA",
+        "evidencia": "eval(entrada)",
+        "mitigacao": "Evitar eval; usar parsers seguros ou sandboxes.",
+        "descoberta_em": "2026-06-23T22:02:33.916024",
+        "corrigida": false
+      }
+    ],
+    "A02": [
+      {
+        "identificador": "A02-COD-0001",
+        "categoria": "A02",
+        "titulo": "Segredo possivelmente hardcoded",
+        "descricao": "Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:4.",
+        "ativo": "/home/marciosouza/scanner/testes_código/teste_inseguro.py:4",
+        "severidade": "ALTA",
+        "evidencia": "api_key = \"MINHA_SENHA_SUPER_SECRETA_12345\"",
+        "mitigacao": "Mover para variáveis de ambiente ou cofre de segredos.",
+        "descoberta_em": "2026-06-23T22:02:33.915979",
+        "corrigida": false
+      }
+    ]
+  }
+}

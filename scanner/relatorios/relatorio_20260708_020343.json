@@ -1,0 +1,13 @@
+{
+  "alvo": "192.168.0.10",
+  "gerado_em": "2026-07-08T02:03:43.156790",
+  "metricas": {
+    "TOTAL": 0,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 0,
+    "BAIXA": 0
+  },
+  "categorias": {}
+}

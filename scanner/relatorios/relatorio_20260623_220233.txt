@@ -1,0 +1,39 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - 192.168.0.10
+Gerado em (UTC): 2026-06-23T22:02:33.916389
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 1
+  - ALTA      : 3
+  - MEDIA     : 0
+  - BAIXA     : 0
+
+[A03] 3 achado(s)
+------------------------------------------------------------------------
+[CRITICA] A03-COD-0004 - Injeção SQL (concatenação ou f-string)
+  Ativo    : /home/marciosouza/scanner/testes_código/teste_inseguro.py:11
+  Descrição: Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:11.
+  Evidência: query = f"SELECT * FROM users WHERE id = {entrada}"
+  Mitigação: Usar consultas parametrizadas ou ORM.
+
+[ALTA] A03-COD-0002 - Uso de eval() detectado
+  Ativo    : /home/marciosouza/scanner/testes_código/teste_inseguro.py:6
+  Descrição: Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:6.
+  Evidência: # Regra 2: Uso de eval()
+  Mitigação: Evitar eval; usar parsers seguros ou sandboxes.
+
+[ALTA] A03-COD-0003 - Uso de eval() detectado
+  Ativo    : /home/marciosouza/scanner/testes_código/teste_inseguro.py:8
+  Descrição: Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:8.
+  Evidência: eval(entrada)
+  Mitigação: Evitar eval; usar parsers seguros ou sandboxes.
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-COD-0001 - Segredo possivelmente hardcoded
+  Ativo    : /home/marciosouza/scanner/testes_código/teste_inseguro.py:4
+  Descrição: Padrão inseguro em /home/marciosouza/scanner/testes_código/teste_inseguro.py:4.
+  Evidência: api_key = "MINHA_SENHA_SUPER_SECRETA_12345"
+  Mitigação: Mover para variáveis de ambiente ou cofre de segredos.

@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""
+Scanner de Vulnerabilidades — ponto de entrada (CLI).
+"""
+import argparse
+import time
+import threading
+from typing import List
+from modulos.utilidades import obter_logger, Vulnerabilidade
+from modulos.coleta import coletar_informacoes
+from modulos.escaneamento import escanear
+from modulos.analise_codigo import analisar_diretorio
+from modulos.pentest import pentest_web
+from modulos.gestao import gerar_relatorio, reavaliar, priorizar
+from modulos.sniffer import iniciar_sniffer
+
+logger = obter_logger("main")
+
+def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidade]:
+    logger.info(f"===== Iniciando ciclo de escaneamento em {alvo} =====")
+    info = coletar_informacoes(alvo)
+    host = info.get("host", alvo)
+    achados: List[Vulnerabilidade] = escanear(host)
+    if caminho_codigo:
+        achados.extend(analisar_diretorio(caminho_codigo))
+    achados.extend(pentest_web(alvo))
+    logger.info(f"Ciclo concluído: {len(achados)} achados.")
+    return achados
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Scanner de Vulnerabilidades.")
+    parser.add_argument("--alvo", required=True)
+    parser.add_argument("--codigo", default=None)
+    parser.add_argument("--continuo", type=int, default=0)
+    parser.add_argument("--sniffer", action="store_true")
+    args = parser.parse_args()
+
+    if args.sniffer:
+        logger.info("[*] Sniffer ativado.")
+        sniff_thread = threading.Thread(target=iniciar_sniffer, daemon=True)
+        sniff_thread.start()
+
+    anteriores: List[Vulnerabilidade] = []
+    while True:
+        atuais = executar_ciclo(args.alvo, args.codigo)
+        consolidados = reavaliar(anteriores, atuais)
+        caminhos = gerar_relatorio(priorizar(consolidados), args.alvo)
+        logger.info(f"Relatório JSON: {caminhos["json"]}")
+        logger.info(f"Relatório TXT : {caminhos["txt"]}")
+        anteriores = [v for v in atuais if not v.corrigida]
+        if args.continuo <= 0: break
+        time.sleep(args.continuo * 60)
+
+if __name__ == "__main__":
+    main()
