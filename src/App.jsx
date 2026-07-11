@@ -12,7 +12,11 @@ function App() {
         const resposta = await fetch(`/relatorios/ultimo_relatorio.json?t=${Date.now()}`, { cache: 'no-store' });
         if (resposta.ok) {
           const dados = await resposta.json();
-          setRelatorio(dados);
+          setRelatorio(prev => {
+            const novaChave = `${dados?.alvo || 'sem-alvo'}-${dados?.gerado_em || 'sem-data'}`;
+            const antigaChave = `${prev?.alvo || 'sem-alvo'}-${prev?.gerado_em || 'sem-data'}`;
+            return novaChave !== antigaChave ? { ...dados, __key: novaChave } : prev;
+          });
           setUltimaAtualizacao(new Date());
         }
       } catch (err) {
@@ -27,10 +31,16 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
-      <header className="max-w-4xl mx-auto mb-8 flex justify-between items-center">
+      <header className="max-w-4xl mx-auto mb-8 flex justify-between items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900">Sentinela Digital</h1>
           <p className="text-gray-600">Monitoramento em tempo real.</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {relatorio?.alvo ? `Alvo atual: ${relatorio.alvo}` : 'Aguardando alvo do último scan...'}
+          </p>
+          <p className="text-sm text-gray-500">
+            {ultimaAtualizacao ? `Última atualização: ${ultimaAtualizacao.toLocaleString('pt-BR')}` : 'Ainda não houve atualização'}
+          </p>
         </div>
         <StatusIndicator lastUpdate={ultimaAtualizacao} />
       </header>
