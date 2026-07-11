@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const resposta = await fetch('/relatorios/ultimo_relatorio.json');
+        const resposta = await fetch(`/relatorios/ultimo_relatorio.json?t=${Date.now()}`, { cache: 'no-store' });
         if (resposta.ok) {
           const dados = await resposta.json();
           setRelatorio(dados);

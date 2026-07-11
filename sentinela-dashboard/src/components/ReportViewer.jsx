@@ -28,6 +28,7 @@ const ReportViewer = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg border">
       <h2 className="text-2xl font-bold mb-2 text-gray-800">Relatório: {data.alvo}</h2>
+      <p className="text-sm text-gray-500 mb-2">URL escaneada: {data.alvo || 'não informada'}</p>
       <p className="text-sm text-gray-500 mb-2">Gerado em {data.gerado_em || 'não informado'}</p>
       {Number(metricas.CRITICA || 0) === 0 ? (
         <p className="text-green-600 mb-4">✅ Nenhum risco crítico detectado no momento.</p>
