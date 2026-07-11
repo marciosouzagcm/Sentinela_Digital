@@ -12,7 +12,11 @@ from modulos.escaneamento import escanear
 from modulos.analise_codigo import analisar_diretorio
 from modulos.pentest import pentest_web
 from modulos.gestao import gerar_relatorio, reavaliar, priorizar
-from modulos.sniffer import iniciar_sniffer
+
+try:
+    from modulos.sniffer import iniciar_sniffer
+except ModuleNotFoundError:  # scapy pode não estar instalado
+    iniciar_sniffer = None
 
 logger = obter_logger("main")
 
@@ -36,17 +40,20 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.sniffer:
-        logger.info("[*] Sniffer ativado.")
-        sniff_thread = threading.Thread(target=iniciar_sniffer, daemon=True)
-        sniff_thread.start()
+        if iniciar_sniffer is None:
+            logger.warning("Sniffer não disponível porque a dependência 'scapy' não está instalada.")
+        else:
+            logger.info("[*] Sniffer ativado.")
+            sniff_thread = threading.Thread(target=iniciar_sniffer, daemon=True)
+            sniff_thread.start()
 
     anteriores: List[Vulnerabilidade] = []
     while True:
         atuais = executar_ciclo(args.alvo, args.codigo)
         consolidados = reavaliar(anteriores, atuais)
         caminhos = gerar_relatorio(priorizar(consolidados), args.alvo)
-        logger.info(f"Relatório JSON: {caminhos["json"]}")
-        logger.info(f"Relatório TXT : {caminhos["txt"]}")
+        logger.info(f"Relatório JSON: {caminhos['json']}")
+        logger.info(f"Relatório TXT : {caminhos['txt']}")
         anteriores = [v for v in atuais if not v.corrigida]
         if args.continuo <= 0: break
         time.sleep(args.continuo * 60)

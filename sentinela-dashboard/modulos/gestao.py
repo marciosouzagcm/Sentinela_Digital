@@ -22,9 +22,11 @@ from .utilidades import (
 
 logger = obter_logger("gestao")
 
-# Diretório padrão dos relatórios
+# Diretórios padrão dos relatórios
 DIR_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "relatorios")
+DIR_FRONTEND_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "relatorios")
 os.makedirs(DIR_RELATORIOS, exist_ok=True)
+os.makedirs(DIR_FRONTEND_RELATORIOS, exist_ok=True)
 
 
 def categorizar(vulns: List[Vulnerabilidade]) -> Dict[str, List[Vulnerabilidade]]:
@@ -96,6 +98,10 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
     with open(caminho_json, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
+    caminho_frontend = os.path.join(DIR_FRONTEND_RELATORIOS, "ultimo_relatorio.json")
+    with open(caminho_frontend, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
     # ---- TXT ----
     linhas: List[str] = []
     linhas.append("=" * 72)
@@ -121,5 +127,5 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
     with open(caminho_txt, "w", encoding="utf-8") as f:
         f.write("\n".join(linhas))
 
-    logger.info("Relatórios gerados: %s | %s", caminho_json, caminho_txt)
-    return {"json": caminho_json, "txt": caminho_txt}
+    logger.info("Relatórios gerados: %s | %s | %s", caminho_json, caminho_txt, caminho_frontend)
+    return {"json": caminho_json, "txt": caminho_txt, "frontend": caminho_frontend}

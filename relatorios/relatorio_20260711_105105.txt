@@ -1,0 +1,19 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://google.com
+Gerado em (UTC): 2026-07-11T10:51:05.743592
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 1
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 0
+  - BAIXA     : 0
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://google.com
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente.
+  Evidência: Cabeçalhos recebidos
+  Mitigação: Adicionar Strict-Transport-Security.
