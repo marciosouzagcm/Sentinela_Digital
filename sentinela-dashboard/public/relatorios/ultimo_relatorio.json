@@ -1,13 +1,28 @@
 {
-  "alvo": "192.168.0.10",
-  "gerado_em": "2026-07-07T08:19:24.125776",
+  "alvo": "https://google.com",
+  "gerado_em": "2026-07-11T10:51:05.743592",
   "metricas": {
-    "TOTAL": 0,
+    "TOTAL": 1,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 0,
+    "ALTA": 1,
     "MEDIA": 0,
     "BAIXA": 0
   },
-  "categorias": {}
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente.",
+        "ativo": "https://google.com",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos",
+        "mitigacao": "Adicionar Strict-Transport-Security.",
+        "descoberta_em": "2026-07-11T10:51:05.742602",
+        "corrigida": false
+      }
+    ]
+  }
 }

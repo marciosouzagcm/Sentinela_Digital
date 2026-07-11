@@ -12,8 +12,11 @@ const severityStyles = {
 const ReportViewer = ({ data }) => {
   const metricas = data?.metricas || {};
   const categorias = Object.entries(data?.categorias || {}).filter(([, achados]) => Array.isArray(achados) && achados.length > 0);
+  const total = Number(metricas.TOTAL ?? Object.values(metricas).reduce((s, v) => s + (Number(v) || 0), 0));
 
-  if (!data || categorias.length === 0) {
+  if (!data) return null;
+
+  if (total === 0) {
     return (
       <div className="p-6 border rounded-lg bg-white shadow-sm text-center">
         <h2 className="text-xl font-bold">Relatório: {data?.alvo || 'Sem alvo'}</h2>
@@ -25,7 +28,12 @@ const ReportViewer = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg border">
       <h2 className="text-2xl font-bold mb-2 text-gray-800">Relatório: {data.alvo}</h2>
-      <p className="text-sm text-gray-500 mb-6">Gerado em {data.gerado_em || 'não informado'}</p>
+      <p className="text-sm text-gray-500 mb-2">Gerado em {data.gerado_em || 'não informado'}</p>
+      {Number(metricas.CRITICA || 0) === 0 ? (
+        <p className="text-green-600 mb-4">✅ Nenhum risco crítico detectado no momento.</p>
+      ) : (
+        <p className="text-red-600 mb-4">⚠️ {metricas.CRITICA} risco(s) crítico(s) detectado(s).</p>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         {['TOTAL', 'CRITICA', 'ALTA', 'MEDIA', 'BAIXA'].map((nivel) => (
