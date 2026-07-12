@@ -1,0 +1,28 @@
+{
+  "alvo": "https://example.com",
+  "gerado_em": "2026-07-12T01:51:02.477810",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-Security-Misconfiguration",
+        "categoria": "A05",
+        "titulo": "Configuração insegura",
+        "descricao": "Configuração insegura detectada.",
+        "ativo": "https://example.com",
+        "severidade": "MEDIA",
+        "evidencia": "Configuração",
+        "mitigacao": "Corrigir configuração.",
+        "descoberta_em": "2026-07-12T01:51:02.477810",
+        "corrigida": false
+      }
+    ]
+  }
+}

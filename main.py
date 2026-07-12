@@ -3,15 +3,18 @@
 Scanner de Vulnerabilidades — ponto de entrada (CLI).
 """
 import argparse
+import os
 import time
 import threading
 from typing import List
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from modulos.utilidades import obter_logger, Vulnerabilidade
 from modulos.coleta import coletar_informacoes
 from modulos.escaneamento import escanear
 from modulos.analise_codigo import analisar_diretorio
 from modulos.pentest import pentest_web
-from modulos.gestao import gerar_relatorio, reavaliar, priorizar
+from modulos.gestao import gerar_relatorio, reavaliar, priorizar, obter_ultimo_relatorio
 
 try:
     from modulos.sniffer import iniciar_sniffer
@@ -19,6 +22,31 @@ except ModuleNotFoundError:  # scapy pode não estar instalado
     iniciar_sniffer = None
 
 logger = obter_logger("main")
+
+
+def _obter_origins_permitidos() -> list[str]:
+    raw_value = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+    return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
+
+
+app = FastAPI(title="Sentinela Digital API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_obter_origins_permitidos(),
+    allow_credentials=True,
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/relatorios/ultimo")
+def relatorio_ultimo():
+    return obter_ultimo_relatorio() or {}
+
 
 def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidade]:
     logger.info(f"===== Iniciando ciclo de escaneamento em {alvo} =====")

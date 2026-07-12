@@ -1,0 +1,19 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://example.com
+Gerado em (UTC): 2026-07-12T01:51:02.477810
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 1
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 0
+
+[A05] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-Security-Misconfiguration - Configuração insegura
+  Ativo    : https://example.com
+  Descrição: Configuração insegura detectada.
+  Evidência: Configuração
+  Mitigação: Corrigir configuração.

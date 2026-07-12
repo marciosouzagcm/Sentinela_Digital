@@ -1,0 +1,28 @@
+{
+  "alvo": "https://opcoes.net.br",
+  "gerado_em": "2026-07-12T04:14:46.502846",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 0,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://opcoes.net.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Transfer-Encoding', 'Content-Type', 'Content-Encoding', 'Vary', 'Access-Control-Allow-Origin', 'Content-Security-Policy', 'Feature-Policy', 'Referrer-Policy', 'Strict-Transport-Security', 'X-Frame-Options', 'X-XSS-Protection', 'Date']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-12T04:14:45.486577",
+        "corrigida": false
+      }
+    ]
+  }
+}

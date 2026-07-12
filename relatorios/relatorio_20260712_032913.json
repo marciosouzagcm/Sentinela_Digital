@@ -1,0 +1,66 @@
+{
+  "alvo": "https://google.com",
+  "gerado_em": "2026-07-12T03:29:13.254174",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 1,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://google.com",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Location', 'Content-Type', 'Content-Security-Policy-Report-Only', 'Date', 'Expires', 'Cache-Control', 'Server', 'Content-Length', 'X-XSS-Protection', 'X-Frame-Options', 'Alt-Svc']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-12T03:29:10.788661",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://google.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Location', 'Content-Type', 'Content-Security-Policy-Report-Only', 'Date', 'Expires', 'Cache-Control', 'Server', 'Content-Length', 'X-XSS-Protection', 'X-Frame-Options', 'Alt-Svc']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-12T03:29:10.788720",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://google.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Location', 'Content-Type', 'Content-Security-Policy-Report-Only', 'Date', 'Expires', 'Cache-Control', 'Server', 'Content-Length', 'X-XSS-Protection', 'X-Frame-Options', 'Alt-Svc']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-12T03:29:10.788747",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://google.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Location', 'Content-Type', 'Content-Security-Policy-Report-Only', 'Date', 'Expires', 'Cache-Control', 'Server', 'Content-Length', 'X-XSS-Protection', 'X-Frame-Options', 'Alt-Svc']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-12T03:29:10.788765",
+        "corrigida": false
+      }
+    ]
+  }
+}
