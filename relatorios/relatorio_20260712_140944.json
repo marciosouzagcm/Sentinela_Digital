@@ -1,0 +1,28 @@
+{
+  "alvo": "https://www.telerik.com",
+  "gerado_em": "2026-07-12T14:09:44.782830",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.telerik.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'CF-Ray', 'CF-Cache-Status', 'Access-Control-Allow-Origin', 'Cache-Control', 'Vary', 'Expires', 'Server', 'Strict-Transport-Security', 'Access-Control-Expose-Headers', 'Cache-Tag', 'Referrer-Policy', 'Request-Context', 'X-Content-Type-Options', 'X-Frame-Options', 'X-XSS-Protection', 'sf-cache-key', 'sf-cache-status', 'Content-Encoding', 'alt-svc']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-12T14:09:41.502080",
+        "corrigida": false
+      }
+    ]
+  }
+}

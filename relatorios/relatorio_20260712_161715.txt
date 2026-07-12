@@ -1,0 +1,41 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.youtube.com
+Gerado em (UTC): 2026-07-12T16:17:15.497200
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 2
+  - MEDIA     : 1
+  - BAIXA     : 1
+
+[A01] 2 achado(s)
+------------------------------------------------------------------------
+[ALTA] A01-PATH-phpmyadmin - Recurso sensível acessível: /phpmyadmin/
+  Ativo    : https://www.youtube.com/phpmyadmin/
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 797306 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[ALTA] A01-PATH-debug - Recurso sensível acessível: /debug
+  Ativo    : https://www.youtube.com/debug
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 793553 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[A10] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A10-SSRF-PROBE - Comportamento suspeito em parâmetro 'url' (possível SSRF)
+  Ativo    : https://www.youtube.com
+  Descrição: A resposta variou ao injetar URL interna em parâmetro comum.
+  Evidência: Tamanhos: base=774723, probe=776766
+  Mitigação: Validar destinos com whitelist e bloquear IPs internos.
+
+[A05] 1 achado(s)
+------------------------------------------------------------------------
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.youtube.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'X-Content-Type-Options', 'Cache-Control', 'Pragma', 'Expires', 'Date', 'P3P', 'Strict-Transport-Security', 'X-Frame-Options', 'Cross-Origin-Opener-Policy', 'Accept-CH', 'Vary', 'Origin-Trial', 'Report-To', 'Permissions-Policy', 'Content-Security-Policy', 'reporting-endpoints', 'document-policy', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.

@@ -9,7 +9,12 @@ function App() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const resposta = await fetch('/relatorios/ultimo_relatorio.json');
+        // A constante cacheBuster garante que o navegador entenda a requisição como nova
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        const resposta = await fetch(`/relatorios/ultimo_relatorio.json${cacheBuster}`, {
+          cache: 'no-store'
+        });
+
         if (resposta.ok) {
           const dados = await resposta.json();
           setRelatorio(dados);
@@ -20,8 +25,12 @@ function App() {
       }
     };
 
+    // Carrega na montagem
     carregarDados();
+
+    // Configura intervalo de 3 segundos
     const intervalo = setInterval(carregarDados, 3000);
+
     return () => clearInterval(intervalo);
   }, []);
 
@@ -31,6 +40,11 @@ function App() {
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900">Sentinela Digital</h1>
           <p className="text-gray-600">Monitoramento em tempo real.</p>
+          {relatorio && (
+            <p className="text-sm text-gray-500 mt-2 font-semibold">
+              Alvo atual: {relatorio.alvo}
+            </p>
+          )}
         </div>
         <StatusIndicator lastUpdate={ultimaAtualizacao} />
       </header>
@@ -39,7 +53,9 @@ function App() {
         {relatorio ? (
           <ReportViewer data={relatorio} />
         ) : (
-          <p className="text-center text-gray-500">Aguardando dados...</p>
+          <div className="text-center py-20">
+            <p className="text-gray-500 animate-pulse">Aguardando dados...</p>
+          </div>
         )}
       </main>
 

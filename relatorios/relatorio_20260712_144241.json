@@ -1,0 +1,126 @@
+{
+  "alvo": "https://facint.edu.br",
+  "gerado_em": "2026-07-12T14:42:41.945495",
+  "metricas": {
+    "TOTAL": 9,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 7,
+    "MEDIA": 2,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/admin",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:34.341485",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-admin_login",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin/login",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/admin/login",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:35.328078",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-.git_config",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /.git/config",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/.git/config",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:37.055314",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-phpmyadmin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /phpmyadmin/",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/phpmyadmin/",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:38.013041",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-server-status",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /server-status",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/server-status",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:38.975677",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-actuator",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /actuator",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/actuator",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:39.935447",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://facint.edu.br/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 16197 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T14:42:40.940323",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://facint.edu.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Cache-Control', 'set-cookie', 'Strict-Transport-Security', 'Referrer-Policy', 'X-Content-Type-Options', 'x-deployment-id', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-12T14:42:33.333510",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://facint.edu.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Cache-Control', 'set-cookie', 'Strict-Transport-Security', 'Referrer-Policy', 'X-Content-Type-Options', 'x-deployment-id', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-12T14:42:33.333570",
+        "corrigida": false
+      }
+    ]
+  }
+}

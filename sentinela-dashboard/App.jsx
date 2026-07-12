@@ -9,10 +9,18 @@ function App() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const resposta = await fetch('/relatorios/ultimo_relatorio.json');
+        // O cache buster ?t=${Date.now()} força uma nova requisição a cada 3 segundos
+        const resposta = await fetch(`/relatorios/ultimo_relatorio.json?t=${Date.now()}`);
+        
         if (resposta.ok) {
           const dados = await resposta.json();
-          setRelatorio(dados);
+          // Atualiza o estado apenas se os dados forem diferentes do atual
+          setRelatorio(prev => {
+            if (JSON.stringify(prev) !== JSON.stringify(dados)) {
+              return dados;
+            }
+            return prev;
+          });
           setUltimaAtualizacao(new Date());
         }
       } catch (err) {
@@ -37,9 +45,17 @@ function App() {
 
       <main>
         {relatorio ? (
-          <ReportViewer data={relatorio} />
+          // A 'key' abaixo é o segredo: ela força o React a re-renderizar o ReportViewer 
+          // toda vez que o alvo ou a data de geração mudar.
+          <ReportViewer 
+            key={`${relatorio.alvo}-${relatorio.gerado_em}`} 
+            data={relatorio} 
+          />
         ) : (
-          <p className="text-center text-gray-500">Aguardando dados...</p>
+          <div className="text-center text-gray-500">
+            <p>Aguardando dados...</p>
+            <p className="text-sm">Verifique se o backend Python está gerando o JSON em /public/relatorios/</p>
+          </div>
         )}
       </main>
 

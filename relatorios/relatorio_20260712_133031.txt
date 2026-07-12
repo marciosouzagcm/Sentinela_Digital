@@ -1,0 +1,19 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.mercadolivre.com.br
+Gerado em (UTC): 2026-07-12T13:30:31.363936
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 1
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 0
+
+[A05] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.mercadolivre.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Transfer-Encoding', 'Connection', 'Date', 'X-Request-Device-Id', 'X-D2id', 'Server', 'Set-Cookie', 'referrer-policy', 'strict-transport-security', 'x-content-type-options', 'x-dns-prefetch-control', 'x-download-options', 'x-permitted-cross-domain-policies', 'x-xss-protection', 'accept-ch', 'accept-ch-lifetime', 'content-security-policy', 'content-security-policy-report-only', 'reporting-endpoints', 'cache-control', 'etag', 'vary', 'content-encoding', 'x-envoy-upstream-service-time', 'x-api-server-segment', 'X-Request-Id', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'Alt-Svc', 'X-Amz-Cf-Id']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.

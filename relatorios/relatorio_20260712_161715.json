@@ -1,0 +1,68 @@
+{
+  "alvo": "https://www.youtube.com",
+  "gerado_em": "2026-07-12T16:17:15.497200",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 2,
+    "MEDIA": 1,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-phpmyadmin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /phpmyadmin/",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://www.youtube.com/phpmyadmin/",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 797306 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T16:17:14.255136",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://www.youtube.com/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 793553 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T16:17:15.095157",
+        "corrigida": false
+      }
+    ],
+    "A10": [
+      {
+        "identificador": "A10-SSRF-PROBE",
+        "categoria": "A10",
+        "titulo": "Comportamento suspeito em parâmetro 'url' (possível SSRF)",
+        "descricao": "A resposta variou ao injetar URL interna em parâmetro comum.",
+        "ativo": "https://www.youtube.com",
+        "severidade": "MEDIA",
+        "evidencia": "Tamanhos: base=774723, probe=776766",
+        "mitigacao": "Validar destinos com whitelist e bloquear IPs internos.",
+        "descoberta_em": "2026-07-12T16:17:15.492357",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.youtube.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'X-Content-Type-Options', 'Cache-Control', 'Pragma', 'Expires', 'Date', 'P3P', 'Strict-Transport-Security', 'X-Frame-Options', 'Cross-Origin-Opener-Policy', 'Accept-CH', 'Vary', 'Origin-Trial', 'Report-To', 'Permissions-Policy', 'Content-Security-Policy', 'reporting-endpoints', 'document-policy', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-12T16:17:12.960874",
+        "corrigida": false
+      }
+    ]
+  }
+}

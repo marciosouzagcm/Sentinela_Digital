@@ -1,0 +1,80 @@
+{
+  "alvo": "https://www.investing.com",
+  "gerado_em": "2026-07-12T13:50:40.407407",
+  "metricas": {
+    "TOTAL": 5,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 2,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.investing.com",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-12T13:50:34.745245",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.investing.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-12T13:50:34.745272",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.investing.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-12T13:50:34.745286",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.investing.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-12T13:50:34.745294",
+        "corrigida": false
+      }
+    ],
+    "A10": [
+      {
+        "identificador": "A10-SSRF-PROBE",
+        "categoria": "A10",
+        "titulo": "Comportamento suspeito em parâmetro 'url' (possível SSRF)",
+        "descricao": "A resposta variou ao injetar URL interna em parâmetro comum.",
+        "ativo": "https://www.investing.com",
+        "severidade": "MEDIA",
+        "evidencia": "Tamanhos: base=1659800, probe=1658777",
+        "mitigacao": "Validar destinos com whitelist e bloquear IPs internos.",
+        "descoberta_em": "2026-07-12T13:50:40.403173",
+        "corrigida": false
+      }
+    ]
+  }
+}

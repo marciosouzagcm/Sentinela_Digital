@@ -1,0 +1,28 @@
+{
+  "alvo": "https://www.mercadolivre.com.br",
+  "gerado_em": "2026-07-12T13:30:31.363936",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.mercadolivre.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Transfer-Encoding', 'Connection', 'Date', 'X-Request-Device-Id', 'X-D2id', 'Server', 'Set-Cookie', 'referrer-policy', 'strict-transport-security', 'x-content-type-options', 'x-dns-prefetch-control', 'x-download-options', 'x-permitted-cross-domain-policies', 'x-xss-protection', 'accept-ch', 'accept-ch-lifetime', 'content-security-policy', 'content-security-policy-report-only', 'reporting-endpoints', 'cache-control', 'etag', 'vary', 'content-encoding', 'x-envoy-upstream-service-time', 'x-api-server-segment', 'X-Request-Id', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'Alt-Svc', 'X-Amz-Cf-Id']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-12T13:30:29.191815",
+        "corrigida": false
+      }
+    ]
+  }
+}

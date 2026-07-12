@@ -1,0 +1,47 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.investing.com
+Gerado em (UTC): 2026-07-12T13:50:40.407407
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 5
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 2
+  - BAIXA     : 2
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://www.investing.com
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 3 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.investing.com
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.investing.com
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.investing.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Set-Cookie', 'Vary', 'inv-version', 'cache-control', 'cf-cache-status', 'Cross-Origin-Embedder-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy', 'Content-Security-Policy', 'Access-Control-Allow-Origin', 'X-Cache-Status', 'X-Environment', 'X-Request-ID', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[A10] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A10-SSRF-PROBE - Comportamento suspeito em parâmetro 'url' (possível SSRF)
+  Ativo    : https://www.investing.com
+  Descrição: A resposta variou ao injetar URL interna em parâmetro comum.
+  Evidência: Tamanhos: base=1659800, probe=1658777
+  Mitigação: Validar destinos com whitelist e bloquear IPs internos.

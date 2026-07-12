@@ -1,0 +1,42 @@
+{
+  "alvo": "https://br.linkedin.com",
+  "gerado_em": "2026-07-12T16:27:45.695489",
+  "metricas": {
+    "TOTAL": 2,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 0,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://br.linkedin.com/admin",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 5 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-12T16:27:42.765428",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://br.linkedin.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'Vary', 'Server', 'Content-Encoding', 'Set-Cookie', 'Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options', 'Content-Security-Policy', 'X-Li-Fabric', 'X-Li-Pop', 'X-Li-Proto', 'X-LI-UUID', 'cf-cache-status', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-12T16:27:42.490880",
+        "corrigida": false
+      }
+    ]
+  }
+}
