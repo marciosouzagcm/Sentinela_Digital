@@ -1,20 +1,18 @@
-import json
 import os
+import shutil
 
-# Ajuste: O caminho agora é relativo à pasta do projeto
-# Isso evita depender do caminho absoluto da sua máquina local (/home/marciosouza/...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CAMINHO_FRONTEND = os.path.join(BASE_DIR, 'public', 'relatorios')
-DIR_RELATORIOS = os.path.join(BASE_DIR, 'relatorios')
+# Definição do caminho
+DIR_FRONTEND_RELATORIOS = os.path.join(os.path.dirname(__file__), '..', 'public', 'relatorios')
 
-def garantir_diretorio(caminho):
-    """Função robusta para criar diretório e evitar FileExistsError."""
-    if os.path.exists(caminho):
-        if not os.path.isdir(caminho):
-            os.remove(caminho)  # Remove se for um arquivo bloqueando a pasta
-            os.makedirs(caminho)
-    else:
-        os.makedirs(caminho, exist_ok=True)
+# --- BLOCO DE CORREÇÃO ---
+if os.path.exists(DIR_FRONTEND_RELATORIOS):
+    # Se existir e NÃO for um diretório, apaga o "arquivo intruso"
+    if not os.path.isdir(DIR_FRONTEND_RELATORIOS):
+        os.remove(DIR_FRONTEND_RELATORIOS)
+        os.makedirs(DIR_FRONTEND_RELATORIOS)
+else:
+    # Se não existir, cria o diretório
+    os.makedirs(DIR_FRONTEND_RELATORIOS, exist_ok=True)
 
 def salvar_relatorio(dados):
     # 1. Garante que os diretórios existam de forma segura

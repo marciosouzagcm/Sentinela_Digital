@@ -1,26 +1,110 @@
 {
-  "alvo": "https://www.google.com",
-  "gerado_em": "2026-07-13T20:39:53.186280",
+  "alvo": "https://app.melver.com.br",
+  "gerado_em": "2026-07-13T20:50:31.219168",
   "metricas": {
-    "TOTAL": 4,
+    "TOTAL": 12,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 1,
-    "MEDIA": 1,
+    "ALTA": 8,
+    "MEDIA": 2,
     "BAIXA": 2
   },
   "categorias": {
-    "A02": [
+    "A01": [
       {
-        "identificador": "A02-HDR-Strict-Transport-Security",
-        "categoria": "A02",
-        "titulo": "Sem HSTS",
-        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
-        "ativo": "https://www.google.com",
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/admin",
         "severidade": "ALTA",
-        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']",
-        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
-        "descoberta_em": "2026-07-13T20:39:50.734901",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:25.191152",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-admin_login",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin/login",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/admin/login",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:26.040150",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-.env",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /.env",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/.env",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 397 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:26.789686",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-.git_config",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /.git/config",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/.git/config",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:27.407119",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-phpmyadmin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /phpmyadmin/",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/phpmyadmin/",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:28.049928",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-server-status",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /server-status",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/server-status",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:28.731424",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-actuator",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /actuator",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/actuator",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:29.370859",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://app.melver.com.br/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 8219 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T20:50:30.101279",
         "corrigida": false
       }
     ],
@@ -30,11 +114,23 @@
         "categoria": "A05",
         "titulo": "Sem Content-Security-Policy",
         "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
-        "ativo": "https://www.google.com",
+        "ativo": "https://app.melver.com.br",
         "severidade": "MEDIA",
-        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
         "mitigacao": "Definir política CSP restritiva.",
-        "descoberta_em": "2026-07-13T20:39:50.734945",
+        "descoberta_em": "2026-07-13T20:50:24.108053",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://app.melver.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T20:50:24.108099",
         "corrigida": false
       },
       {
@@ -42,11 +138,11 @@
         "categoria": "A05",
         "titulo": "Sem X-Content-Type-Options",
         "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
-        "ativo": "https://www.google.com",
+        "ativo": "https://app.melver.com.br",
         "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
         "mitigacao": "Definir 'nosniff'.",
-        "descoberta_em": "2026-07-13T20:39:50.734955",
+        "descoberta_em": "2026-07-13T20:50:24.108157",
         "corrigida": false
       },
       {
@@ -54,11 +150,11 @@
         "categoria": "A05",
         "titulo": "Sem Referrer-Policy",
         "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
-        "ativo": "https://www.google.com",
+        "ativo": "https://app.melver.com.br",
         "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
         "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
-        "descoberta_em": "2026-07-13T20:39:50.734961",
+        "descoberta_em": "2026-07-13T20:50:24.108190",
         "corrigida": false
       }
     ]
