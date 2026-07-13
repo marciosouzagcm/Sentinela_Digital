@@ -1,0 +1,31 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.uol.com.br
+Gerado em (UTC): 2026-07-13T21:17:45.675891
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 3
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 2
+
+[A05] 3 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.uol.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Content-Length', 'Connection', 'Date', 'Server', 'Referrer-Policy', 'Content-Security-Policy', 'Strict-Transport-Security', 'Cache-Control', 'Last-Modified', 'ETag', 'Expires', 'Content-Encoding', 'Vary', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'Age']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.uol.com.br
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Content-Length', 'Connection', 'Date', 'Server', 'Referrer-Policy', 'Content-Security-Policy', 'Strict-Transport-Security', 'Cache-Control', 'Last-Modified', 'ETag', 'Expires', 'Content-Encoding', 'Vary', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'Age']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-BANNER - Versão do servidor exposta no cabeçalho Server
+  Ativo    : https://www.uol.com.br
+  Descrição: O cabeçalho Server revela a versão: 'marrakesh 1.25.0'.
+  Evidência: marrakesh 1.25.0
+  Mitigação: Ocultar/normalizar o cabeçalho Server.

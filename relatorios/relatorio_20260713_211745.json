@@ -1,0 +1,52 @@
+{
+  "alvo": "https://www.uol.com.br",
+  "gerado_em": "2026-07-13T21:17:45.675891",
+  "metricas": {
+    "TOTAL": 3,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.uol.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Content-Length', 'Connection', 'Date', 'Server', 'Referrer-Policy', 'Content-Security-Policy', 'Strict-Transport-Security', 'Cache-Control', 'Last-Modified', 'ETag', 'Expires', 'Content-Encoding', 'Vary', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'Age']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T21:17:39.359129",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.uol.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Content-Length', 'Connection', 'Date', 'Server', 'Referrer-Policy', 'Content-Security-Policy', 'Strict-Transport-Security', 'Cache-Control', 'Last-Modified', 'ETag', 'Expires', 'Content-Encoding', 'Vary', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'Age']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-13T21:17:39.359150",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-BANNER",
+        "categoria": "A05",
+        "titulo": "Versão do servidor exposta no cabeçalho Server",
+        "descricao": "O cabeçalho Server revela a versão: 'marrakesh 1.25.0'.",
+        "ativo": "https://www.uol.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "marrakesh 1.25.0",
+        "mitigacao": "Ocultar/normalizar o cabeçalho Server.",
+        "descoberta_em": "2026-07-13T21:17:39.359160",
+        "corrigida": false
+      }
+    ]
+  }
+}
