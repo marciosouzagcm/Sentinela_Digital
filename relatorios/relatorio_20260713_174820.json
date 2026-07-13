@@ -1,0 +1,40 @@
+{
+  "alvo": "https://open.spotify.com",
+  "gerado_em": "2026-07-13T17:48:20.594943",
+  "metricas": {
+    "TOTAL": 2,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://open.spotify.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Connection', 'set-cookie', 'content-security-policy', 'content-type', 'x-spotify-open-index', 'x-envoy-upstream-service-time', 'server', 'via', 'strict-transport-security', 'x-content-type-options', 'content-encoding', 'Accept-Ranges', 'Date', 'X-Served-By', 'X-Cache', 'X-Cache-Hits', 'X-Timer', 'Vary', 'transfer-encoding']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T17:48:18.257588",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://open.spotify.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Connection', 'set-cookie', 'content-security-policy', 'content-type', 'x-spotify-open-index', 'x-envoy-upstream-service-time', 'server', 'via', 'strict-transport-security', 'x-content-type-options', 'content-encoding', 'Accept-Ranges', 'Date', 'X-Served-By', 'X-Cache', 'X-Cache-Hits', 'X-Timer', 'Vary', 'transfer-encoding']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T17:48:18.257630",
+        "corrigida": false
+      }
+    ]
+  }
+}

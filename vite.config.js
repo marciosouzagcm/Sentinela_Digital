@@ -7,8 +7,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    // ADICIONE ISSO AQUI:
-    publicDir: false, 
+    // Remova o publicDir: false daqui!
     server: {
       proxy: {
         '/api': {
