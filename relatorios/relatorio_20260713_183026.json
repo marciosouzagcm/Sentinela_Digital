@@ -1,0 +1,78 @@
+{
+  "alvo": "https://pt.wikipedia.org",
+  "gerado_em": "2026-07-13T18:30:26.034402",
+  "metricas": {
+    "TOTAL": 5,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 3,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://pt.wikipedia.org",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T18:30:23.922313",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://pt.wikipedia.org",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T18:30:23.922336",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://pt.wikipedia.org",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T18:30:23.922348",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-BANNER",
+        "categoria": "A05",
+        "titulo": "Versão do servidor exposta no cabeçalho Server",
+        "descricao": "O cabeçalho Server revela a versão: 'mw-web.eqiad.main-5b864b78bc-zphbr'.",
+        "ativo": "https://pt.wikipedia.org",
+        "severidade": "BAIXA",
+        "evidencia": "mw-web.eqiad.main-5b864b78bc-zphbr",
+        "mitigacao": "Ocultar/normalizar o cabeçalho Server.",
+        "descoberta_em": "2026-07-13T18:30:23.922355",
+        "corrigida": false
+      }
+    ],
+    "A10": [
+      {
+        "identificador": "A10-SSRF-PROBE",
+        "categoria": "A10",
+        "titulo": "Comportamento suspeito em parâmetro 'url' (possível SSRF)",
+        "descricao": "A resposta variou ao injetar URL interna em parâmetro comum.",
+        "ativo": "https://pt.wikipedia.org",
+        "severidade": "MEDIA",
+        "evidencia": "Tamanhos: base=0, probe=253633",
+        "mitigacao": "Validar destinos com whitelist e bloquear IPs internos.",
+        "descoberta_em": "2026-07-13T18:30:26.028295",
+        "corrigida": false
+      }
+    ]
+  }
+}

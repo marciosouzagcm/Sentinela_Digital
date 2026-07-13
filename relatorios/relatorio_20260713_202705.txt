@@ -1,0 +1,47 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.muncab.com.br
+Gerado em (UTC): 2026-07-13T20:27:05.431067
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 5
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 3
+  - BAIXA     : 1
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://www.muncab.com.br
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 3 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.muncab.com.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.muncab.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.muncab.com.br
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[A10] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A10-SSRF-PROBE - Comportamento suspeito em parâmetro 'url' (possível SSRF)
+  Ativo    : https://www.muncab.com.br
+  Descrição: A resposta variou ao injetar URL interna em parâmetro comum.
+  Evidência: Tamanhos: base=413635, probe=374249
+  Mitigação: Validar destinos com whitelist e bloquear IPs internos.

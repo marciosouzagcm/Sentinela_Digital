@@ -1,20 +1,7 @@
-"""
-Módulo de Gestão de Vulnerabilidades.
-
-Implementa as 6 etapas do processo de identificação:
-
-1. Identificação  -> recebe a lista bruta de achados dos demais módulos
-2. Categorização  -> agrupa por categoria OWASP
-3. Priorização    -> ordena por severidade (CVSS simplificado)
-4. Mitigação      -> consolida recomendações
-5. Reavaliação    -> compara com escaneamento anterior e marca corrigidas
-6. Relatório      -> gera arquivos JSON e TXT em relatorios/
-"""
-
-import json
 import os
 import importlib.util
 import urllib.parse
+import json
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -27,8 +14,18 @@ logger = obter_logger("gestao")
 # Diretórios padrão dos relatórios
 DIR_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "relatorios")
 DIR_FRONTEND_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "relatorios")
-os.makedirs(DIR_RELATORIOS, exist_ok=True)
-os.makedirs(DIR_FRONTEND_RELATORIOS, exist_ok=True)
+
+def _seguro_makedirs(caminho: str):
+    """Cria diretório de forma segura, evitando erros se o caminho já existir."""
+    if not os.path.exists(caminho):
+        try:
+            os.makedirs(caminho, exist_ok=True)
+        except OSError as e:
+            if not os.path.isdir(caminho):
+                raise e
+
+_seguro_makedirs(DIR_RELATORIOS)
+_seguro_makedirs(DIR_FRONTEND_RELATORIOS)
 
 def _obter_configuracao_tidb() -> Dict[str, object]:
     """Extrai host, porta, usuário, senha e banco a partir da URL do TiDB."""
@@ -77,7 +74,7 @@ def _carregar_modulo_tidb():
     try:
         import pymysql
         return pymysql
-    except Exception as exc:  # pragma: no cover - depende do ambiente
+    except Exception as exc:  # pragma: no cover
         logger.warning("Não foi possível importar pymysql: %s", exc)
         return None
 
@@ -91,7 +88,7 @@ def _conectar_tidb():
     configuracao = _obter_configuracao_tidb()
     if not _credenciais_tidb_estao_validas(configuracao):
         logger.warning(
-            "Credenciais do TiDB incompletas ou ainda em placeholder. Ajuste TIDB_URL/TIDB_USER/TIDB_PASSWORD para a senha real do cluster."
+            "Credenciais do TiDB incompletas ou ainda em placeholder."
         )
         return None
 
@@ -109,7 +106,7 @@ def _conectar_tidb():
 
     try:
         return pymysql.connect(**params)
-    except Exception as exc:  # pragma: no cover - depende do ambiente
+    except Exception as exc:  # pragma: no cover
         if configuracao.get("database") and "Unknown database" in str(exc):
             try:
                 connection_root = pymysql.connect(
@@ -146,7 +143,7 @@ def _persistir_tidb(payload: Dict[str, object]) -> bool:
         connection.close()
         logger.info("Relatório persistido com sucesso no TiDB")
         return True
-    except Exception as exc:  # pragma: no cover - depende do ambiente
+    except Exception as exc:  # pragma: no cover
         logger.warning("Falha ao persistir em TiDB: %s", exc)
         return False
 
@@ -180,7 +177,7 @@ def obter_ultimo_relatorio() -> Optional[Dict[str, object]]:
         if resultado and resultado[0]:
             logger.info("Relatório carregado diretamente do TiDB")
             return json.loads(resultado[0])
-    except Exception as exc:  # pragma: no cover - depende do ambiente
+    except Exception as exc:  # pragma: no cover
         logger.warning("Falha ao ler do TiDB: %s", exc)
     return _carregar_ultimo_relatorio_local()
 
@@ -202,10 +199,7 @@ def priorizar(vulns: List[Vulnerabilidade]) -> List[Vulnerabilidade]:
 
 def reavaliar(anteriores: List[Vulnerabilidade],
               atuais: List[Vulnerabilidade]) -> List[Vulnerabilidade]:
-    """
-    Compara um conjunto anterior com o atual e marca como `corrigida`
-    aquelas que estavam presentes antes e não foram mais detectadas.
-    """
+    """Compara um conjunto anterior com o atual e marca como corrigida."""
     ids_atuais = {v.identificador for v in atuais}
     resultado: List[Vulnerabilidade] = list(atuais)
     for v in anteriores:
@@ -229,12 +223,7 @@ def _gerar_metricas(vulns: List[Vulnerabilidade]) -> Dict[str, int]:
 
 
 def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
-    """
-    Persiste dois arquivos em `relatorios/`:
-      - JSON estruturado (para integração com outras ferramentas)
-      - TXT legível (para leitura humana)
-    Retorna os caminhos gerados.
-    """
+    """Persiste arquivos de relatório JSON e TXT."""
     carimbo = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     nome_base = f"relatorio_{carimbo}"
     caminho_json = os.path.join(DIR_RELATORIOS, nome_base + ".json")
@@ -259,12 +248,13 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
     _persistir_tidb(payload)
 
     # ---- TXT ----
-    linhas: List[str] = []
-    linhas.append("=" * 72)
-    linhas.append(f"RELATÓRIO DE VULNERABILIDADES - {alvo}")
-    linhas.append(f"Gerado em (UTC): {payload['gerado_em']}")
-    linhas.append("=" * 72)
-    linhas.append("MÉTRICAS:")
+    linhas: List[str] = [
+        "=" * 72,
+        f"RELATÓRIO DE VULNERABILIDADES - {alvo}",
+        f"Gerado em (UTC): {payload['gerado_em']}",
+        "=" * 72,
+        "MÉTRICAS:"
+    ]
     for k, v in metricas.items():
         linhas.append(f"  - {k:<10}: {v}")
     linhas.append("")

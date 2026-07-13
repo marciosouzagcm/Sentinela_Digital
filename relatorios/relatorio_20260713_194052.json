@@ -1,0 +1,28 @@
+{
+  "alvo": "https://hackertarget.com",
+  "gerado_em": "2026-07-13T19:40:52.772243",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 0,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://hackertarget.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Vary', 'Expires', 'Cache-Control', 'Link', 'Strict-Transport-Security', 'X-Frame-Options', 'X-Xss-Protection', 'X-Content-Type-Options', 'Content-Security-Policy', 'Report-To', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T19:40:48.900321",
+        "corrigida": false
+      }
+    ]
+  }
+}

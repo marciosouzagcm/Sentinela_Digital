@@ -1,0 +1,37 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.aikido.dev
+Gerado em (UTC): 2026-07-13T19:09:41.195856
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 2
+  - BAIXA     : 2
+
+[A05] 4 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.aikido.dev
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'set-cookie', 'CF-Ray', 'CF-Cache-Status', 'Age', 'Content-Encoding', 'Last-Modified', 'Link', 'Server', 'Strict-Transport-Security', 'Vary', 'surrogate-control', 'surrogate-key', 'x-lambda-id', 'x-wf-region', 'alt-svc']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.aikido.dev
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'set-cookie', 'CF-Ray', 'CF-Cache-Status', 'Age', 'Content-Encoding', 'Last-Modified', 'Link', 'Server', 'Strict-Transport-Security', 'Vary', 'surrogate-control', 'surrogate-key', 'x-lambda-id', 'x-wf-region', 'alt-svc']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.aikido.dev
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'set-cookie', 'CF-Ray', 'CF-Cache-Status', 'Age', 'Content-Encoding', 'Last-Modified', 'Link', 'Server', 'Strict-Transport-Security', 'Vary', 'surrogate-control', 'surrogate-key', 'x-lambda-id', 'x-wf-region', 'alt-svc']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.aikido.dev
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'set-cookie', 'CF-Ray', 'CF-Cache-Status', 'Age', 'Content-Encoding', 'Last-Modified', 'Link', 'Server', 'Strict-Transport-Security', 'Vary', 'surrogate-control', 'surrogate-key', 'x-lambda-id', 'x-wf-region', 'alt-svc']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.

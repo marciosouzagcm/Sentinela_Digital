@@ -1,0 +1,45 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://pt.wikipedia.org
+Gerado em (UTC): 2026-07-13T18:30:26.034402
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 5
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 3
+  - BAIXA     : 2
+
+[A05] 4 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://pt.wikipedia.org
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://pt.wikipedia.org
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://pt.wikipedia.org
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'server', 'x-content-type-options', 'cache-control', 'last-modified', 'location', 'content-length', 'content-type', 'age', 'vary', 'x-cache', 'x-cache-status', 'strict-transport-security', 'report-to', 'nel', 'set-cookie', 'x-client-ip', 'x-request-id', 'x-analytics', 'server-timing']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[BAIXA] A05-BANNER - Versão do servidor exposta no cabeçalho Server
+  Ativo    : https://pt.wikipedia.org
+  Descrição: O cabeçalho Server revela a versão: 'mw-web.eqiad.main-5b864b78bc-zphbr'.
+  Evidência: mw-web.eqiad.main-5b864b78bc-zphbr
+  Mitigação: Ocultar/normalizar o cabeçalho Server.
+
+[A10] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A10-SSRF-PROBE - Comportamento suspeito em parâmetro 'url' (possível SSRF)
+  Ativo    : https://pt.wikipedia.org
+  Descrição: A resposta variou ao injetar URL interna em parâmetro comum.
+  Evidência: Tamanhos: base=0, probe=253633
+  Mitigação: Validar destinos com whitelist e bloquear IPs internos.

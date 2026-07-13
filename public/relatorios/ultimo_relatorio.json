@@ -1,26 +1,78 @@
 {
-  "alvo": "https://cvefeed.io",
-  "gerado_em": "2026-07-13T18:20:44.735636",
+  "alvo": "https://www.muncab.com.br",
+  "gerado_em": "2026-07-13T20:27:05.431067",
   "metricas": {
-    "TOTAL": 1,
+    "TOTAL": 5,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 0,
-    "MEDIA": 1,
-    "BAIXA": 0
+    "ALTA": 1,
+    "MEDIA": 3,
+    "BAIXA": 1
   },
   "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.muncab.com.br",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-13T20:26:39.659336",
+        "corrigida": false
+      }
+    ],
     "A05": [
       {
         "identificador": "A05-HDR-Content-Security-Policy",
         "categoria": "A05",
         "titulo": "Sem Content-Security-Policy",
         "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
-        "ativo": "https://cvefeed.io",
+        "ativo": "https://www.muncab.com.br",
         "severidade": "MEDIA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Content-Language', 'Cross-Origin-Opener-Policy', 'Link', 'Referrer-Policy', 'Server', 'Strict-Transport-Security', 'Vary', 'X-Content-Type-Options', 'X-Frame-Options', 'Cf-Cache-Status', 'Speculation-Rules', 'Report-To', 'Nel', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
         "mitigacao": "Definir política CSP restritiva.",
-        "descoberta_em": "2026-07-13T18:20:40.291804",
+        "descoberta_em": "2026-07-13T20:26:39.659369",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.muncab.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T20:26:39.659377",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.muncab.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Nel', 'Report-To', 'Last-Modified', 'Cache-Control', 'Expires', 'Vary', 'X-Content-Type-Options', 'Cf-Cache-Status', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T20:26:39.659385",
+        "corrigida": false
+      }
+    ],
+    "A10": [
+      {
+        "identificador": "A10-SSRF-PROBE",
+        "categoria": "A10",
+        "titulo": "Comportamento suspeito em parâmetro 'url' (possível SSRF)",
+        "descricao": "A resposta variou ao injetar URL interna em parâmetro comum.",
+        "ativo": "https://www.muncab.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Tamanhos: base=413635, probe=374249",
+        "mitigacao": "Validar destinos com whitelist e bloquear IPs internos.",
+        "descoberta_em": "2026-07-13T20:27:05.427914",
         "corrigida": false
       }
     ]

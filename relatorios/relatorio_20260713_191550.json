@@ -1,0 +1,28 @@
+{
+  "alvo": "https://www.soloiron.com.br",
+  "gerado_em": "2026-07-13T19:15:50.013596",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.soloiron.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Content-Encoding', 'Strict-Transport-Security', 'Link', 'X-XSS-Protection', 'X-Frame-Options', 'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy', 'Expires', 'Cache-Control', 'Pragma', 'Date', 'Content-Length', 'Connection', 'Vary']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T19:15:34.883772",
+        "corrigida": false
+      }
+    ]
+  }
+}
