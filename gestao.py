@@ -4,31 +4,30 @@ import urllib.parse
 import json
 from datetime import datetime
 from typing import Dict, List, Optional
-
 from .utilidades import (
     Vulnerabilidade, PESO_SEVERIDADE, normalizar_lista, obter_logger,
 )
 
 logger = obter_logger("gestao")
 
-# --- CONFIGURAÇÃO FORÇADA DE DIRETÓRIOS ---
+# Caminhos definidos
 DIR_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "relatorios")
-# Forçando uso de /tmp para evitar conflitos de permissão/arquivo no Render
 DIR_FRONTEND_RELATORIOS = "/tmp/relatorios"
 
-def _garantir_ambientes():
-    """Função única para garantir que os diretórios existam."""
+def _setup_folders():
+    """Tenta criar as pastas. Se o caminho for um arquivo bloqueante, deleta o arquivo."""
     for path in [DIR_RELATORIOS, DIR_FRONTEND_RELATORIOS]:
         try:
-            if os.path.exists(path) and not os.path.isdir(path):
-                os.remove(path)
-            if not os.path.exists(path):
+            if os.path.exists(path):
+                if not os.path.isdir(path):
+                    os.remove(path)
+                    os.makedirs(path, exist_ok=True)
+            else:
                 os.makedirs(path, exist_ok=True)
-        except Exception as e:
-            logger.error(f"Não foi possível garantir {path}: {e}")
+        except Exception:
+            pass
 
-# Executa a garantia uma única vez ao carregar o módulo
-_garantir_ambientes()
+_setup_folders()
 
 def _obter_configuracao_tidb() -> Dict[str, object]:
     url = os.getenv("TIDB_URL") or ""
@@ -43,13 +42,7 @@ def _obter_configuracao_tidb() -> Dict[str, object]:
         "database": urllib.parse.unquote(parsed.path.lstrip("/")) or os.getenv("TIDB_DATABASE", "sentinela"),
     }
 
-def _credenciais_tidb_estao_validas(configuracao: Dict[str, object]) -> bool:
-    user = str(configuracao.get("user") or "").strip()
-    password = str(configuracao.get("password") or "").strip()
-    return user not in {"", "root"} and password != ""
-
 def _carregar_modulo_tidb():
-    if not os.getenv("TIDB_URL"): return None
     try:
         import pymysql
         return pymysql
@@ -75,18 +68,13 @@ def _persistir_tidb(payload: Dict[str, object]) -> bool:
         return True
     except: return False
 
-def _persistir_arquivo_local(payload: Dict[str, object], caminho: str) -> None:
-    try:
-        with open(caminho, "w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        logger.error(f"Erro ao salvar JSON local: {e}")
-
 def obter_ultimo_relatorio() -> Optional[Dict[str, object]]:
     caminho = os.path.join(DIR_FRONTEND_RELATORIOS, "ultimo_relatorio.json")
     if os.path.exists(caminho):
-        with open(caminho, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(caminho, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except: return None
     return None
 
 def categorizar(vulns: List[Vulnerabilidade]) -> Dict[str, List[Vulnerabilidade]]:
@@ -124,6 +112,8 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
         "categorias": {cat: normalizar_lista(lst) for cat, lst in categorizar(priorizar(vulns)).items()}
     }
     with open(path_json, "w", encoding="utf-8") as f: json.dump(payload, f, ensure_ascii=False, indent=2)
-    _persistir_arquivo_local(payload, path_front)
+    try:
+        with open(path_front, "w", encoding="utf-8") as f: json.dump(payload, f, ensure_ascii=False, indent=2)
+    except: pass
     _persistir_tidb(payload)
     return {"json": path_json, "frontend": path_front}
