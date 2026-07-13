@@ -1,0 +1,102 @@
+{
+  "alvo": "https://www.festivaldojapao.com",
+  "gerado_em": "2026-07-13T10:57:25.395590",
+  "metricas": {
+    "TOTAL": 7,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 2,
+    "MEDIA": 3,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-PORTA-21",
+        "categoria": "A02",
+        "titulo": "Serviço sensível exposto na porta 21",
+        "descricao": "FTP em texto claro exposto. Serviço detectado: ftp.",
+        "ativo": "www.festivaldojapao.com:21",
+        "severidade": "ALTA",
+        "evidencia": "{'porta': 21, 'servico': 'ftp', 'produto': 'Pure-FTPd', 'versao': ''}",
+        "mitigacao": "Substituir por SFTP/FTPS e restringir acesso.",
+        "descoberta_em": "2026-07-13T10:57:22.064460",
+        "corrigida": false
+      },
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.festivaldojapao.com",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'Link', 'Server-Timing', 'Upgrade', 'Connection', 'Vary', 'Content-Encoding', 'Keep-Alive', 'Transfer-Encoding', 'Content-Type']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-13T10:57:22.569544",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-PORTA-3306",
+        "categoria": "A05",
+        "titulo": "Serviço sensível exposto na porta 3306",
+        "descricao": "MySQL acessível externamente. Serviço detectado: mysql.",
+        "ativo": "www.festivaldojapao.com:3306",
+        "severidade": "MEDIA",
+        "evidencia": "{'porta': 3306, 'servico': 'mysql', 'produto': 'MySQL', 'versao': '5.7.44-48'}",
+        "mitigacao": "Restringir bind-address e revisar contas.",
+        "descoberta_em": "2026-07-13T10:57:22.064475",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.festivaldojapao.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'Link', 'Server-Timing', 'Upgrade', 'Connection', 'Vary', 'Content-Encoding', 'Keep-Alive', 'Transfer-Encoding', 'Content-Type']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T10:57:22.569561",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.festivaldojapao.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'Link', 'Server-Timing', 'Upgrade', 'Connection', 'Vary', 'Content-Encoding', 'Keep-Alive', 'Transfer-Encoding', 'Content-Type']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T10:57:22.569568",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.festivaldojapao.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'Link', 'Server-Timing', 'Upgrade', 'Connection', 'Vary', 'Content-Encoding', 'Keep-Alive', 'Transfer-Encoding', 'Content-Type']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-13T10:57:22.569640",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.festivaldojapao.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'Link', 'Server-Timing', 'Upgrade', 'Connection', 'Vary', 'Content-Encoding', 'Keep-Alive', 'Transfer-Encoding', 'Content-Type']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T10:57:22.569652",
+        "corrigida": false
+      }
+    ]
+  }
+}

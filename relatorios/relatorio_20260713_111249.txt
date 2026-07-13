@@ -1,0 +1,57 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://pt.erome.com
+Gerado em (UTC): 2026-07-13T11:12:49.928807
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 7
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 2
+  - MEDIA     : 2
+  - BAIXA     : 3
+
+[A01] 2 achado(s)
+------------------------------------------------------------------------
+[ALTA] A01-PATH-admin - Recurso sensível acessível: /admin
+  Ativo    : https://pt.erome.com/admin
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 62730 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[ALTA] A01-PATH-debug - Recurso sensível acessível: /debug
+  Ativo    : https://pt.erome.com/debug
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 106537 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[A05] 5 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://pt.erome.com
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://pt.erome.com
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://pt.erome.com
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://pt.erome.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[BAIXA] A05-BANNER - Versão do servidor exposta no cabeçalho Server
+  Ativo    : https://pt.erome.com
+  Descrição: O cabeçalho Server revela a versão: 'BunnyCDN-BR1-1342'.
+  Evidência: BunnyCDN-BR1-1342
+  Mitigação: Ocultar/normalizar o cabeçalho Server.

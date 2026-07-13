@@ -1,0 +1,40 @@
+{
+  "alvo": "https://www.superbet.bet.br",
+  "gerado_em": "2026-07-13T10:42:11.112974",
+  "metricas": {
+    "TOTAL": 2,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 2,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.superbet.bet.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Length', 'Connection', 'Cache-Control', 'Location', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'X-XSS-Protection', 'Referrer-Policy', 'X-Content-Type-Options', 'Strict-Transport-Security', 'Permissions-Policy']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T10:42:10.331578",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.superbet.bet.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Length', 'Connection', 'Cache-Control', 'Location', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'X-XSS-Protection', 'Referrer-Policy', 'X-Content-Type-Options', 'Strict-Transport-Security', 'Permissions-Policy']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T10:42:10.331597",
+        "corrigida": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "alvo": "https://pt.stripchat.com",
+  "gerado_em": "2026-07-13T11:25:27.049003",
+  "metricas": {
+    "TOTAL": 3,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://pt.stripchat.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T11:25:25.271979",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://pt.stripchat.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-13T11:25:25.272045",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://pt.stripchat.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T11:25:25.272055",
+        "corrigida": false
+      }
+    ]
+  }
+}

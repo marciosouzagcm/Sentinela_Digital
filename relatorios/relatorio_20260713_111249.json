@@ -1,0 +1,102 @@
+{
+  "alvo": "https://pt.erome.com",
+  "gerado_em": "2026-07-13T11:12:49.928807",
+  "metricas": {
+    "TOTAL": 7,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 2,
+    "MEDIA": 2,
+    "BAIXA": 3
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://pt.erome.com/admin",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 62730 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T11:12:47.226726",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://pt.erome.com/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 106537 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T11:12:49.690350",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://pt.erome.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T11:12:46.990046",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://pt.erome.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T11:12:46.990087",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://pt.erome.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-13T11:12:46.990097",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://pt.erome.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Vary', 'Server', 'CDN-PullZone', 'CDN-RequestCountryCode', 'Cache-Control', 'Set-Cookie', 'x-via-poph', 'Strict-Transport-Security', 'CDN-ProxyVer', 'CDN-RequestPullSuccess', 'CDN-RequestPullCode', 'CDN-CachedAt', 'CDN-EdgeStorageId', 'CDN-RequestId', 'CDN-Cache', 'CDN-Status', 'CDN-RequestTime', 'Content-Encoding']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T11:12:46.990113",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-BANNER",
+        "categoria": "A05",
+        "titulo": "Versão do servidor exposta no cabeçalho Server",
+        "descricao": "O cabeçalho Server revela a versão: 'BunnyCDN-BR1-1342'.",
+        "ativo": "https://pt.erome.com",
+        "severidade": "BAIXA",
+        "evidencia": "BunnyCDN-BR1-1342",
+        "mitigacao": "Ocultar/normalizar o cabeçalho Server.",
+        "descoberta_em": "2026-07-13T11:12:46.990122",
+        "corrigida": false
+      }
+    ]
+  }
+}

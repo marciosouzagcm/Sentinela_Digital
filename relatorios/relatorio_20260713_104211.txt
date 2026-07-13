@@ -1,0 +1,25 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.superbet.bet.br
+Gerado em (UTC): 2026-07-13T10:42:11.112974
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 2
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 2
+  - BAIXA     : 0
+
+[A05] 2 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.superbet.bet.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Length', 'Connection', 'Cache-Control', 'Location', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'X-XSS-Protection', 'Referrer-Policy', 'X-Content-Type-Options', 'Strict-Transport-Security', 'Permissions-Policy']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.superbet.bet.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Length', 'Connection', 'Cache-Control', 'Location', 'X-Cache', 'Via', 'X-Amz-Cf-Pop', 'X-Amz-Cf-Id', 'X-XSS-Protection', 'Referrer-Policy', 'X-Content-Type-Options', 'Strict-Transport-Security', 'Permissions-Policy']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.

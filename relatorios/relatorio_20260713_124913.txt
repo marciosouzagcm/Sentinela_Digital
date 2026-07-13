@@ -1,0 +1,31 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://pt.stripchat.com
+Gerado em (UTC): 2026-07-13T12:49:13.891805
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 3
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 2
+
+[A05] 3 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://pt.stripchat.com
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir política CSP restritiva.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://pt.stripchat.com
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://pt.stripchat.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'x-backend', 'Content-Encoding', 'x-frame-options', 'set-cookie', 'Strict-Transport-Security', 'vary', 'cf-cache-status', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.

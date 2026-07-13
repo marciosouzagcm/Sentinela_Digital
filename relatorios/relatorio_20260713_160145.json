@@ -1,0 +1,78 @@
+{
+  "alvo": "https://www.shopee.com.br",
+  "gerado_em": "2026-07-13T16:01:45.197662",
+  "metricas": {
+    "TOTAL": 5,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 2,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.shopee.com.br",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection', 'Location']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-13T16:01:40.334080",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.shopee.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection', 'Location']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T16:01:40.334143",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.shopee.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection', 'Location']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T16:01:40.334158",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.shopee.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection', 'Location']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-13T16:01:40.334169",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.shopee.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection', 'Location']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T16:01:40.334178",
+        "corrigida": false
+      }
+    ]
+  }
+}

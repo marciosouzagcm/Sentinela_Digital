@@ -1,0 +1,41 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://g1.globo.com
+Gerado em (UTC): 2026-07-13T16:09:14.112607
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 2
+  - BAIXA     : 1
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://g1.globo.com
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 2 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://g1.globo.com
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://g1.globo.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[A10] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A10-SSRF-PROBE - Comportamento suspeito em parâmetro 'url' (possível SSRF)
+  Ativo    : https://g1.globo.com
+  Descrição: A resposta variou ao injetar URL interna em parâmetro comum.
+  Evidência: Tamanhos: base=1001485, probe=1005216
+  Mitigação: Validar destinos com whitelist e bloquear IPs internos.
