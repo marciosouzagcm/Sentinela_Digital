@@ -1,0 +1,39 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.google.com
+Gerado em (UTC): 2026-07-13T20:39:53.186280
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 1
+  - BAIXA     : 2
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://www.google.com
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 3 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.google.com
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']
+  Mitigação: Definir política CSP restritiva.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.google.com
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.google.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Content-Type', 'Date', 'Expires', 'Cache-Control', 'Content-Security-Policy-Report-Only', 'Accept-CH', 'P3P', 'Content-Encoding', 'Server', 'X-XSS-Protection', 'X-Frame-Options', 'Set-Cookie', 'Alt-Svc', 'Transfer-Encoding']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
