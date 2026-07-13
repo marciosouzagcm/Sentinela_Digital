@@ -1,0 +1,66 @@
+{
+  "alvo": "https://www.tetrapak.com.br",
+  "gerado_em": "2026-07-13T21:09:17.104177",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 2,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.tetrapak.com.br",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-13T21:09:07.207661",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.tetrapak.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T21:09:07.207862",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.tetrapak.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-13T21:09:07.207884",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.tetrapak.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-13T21:09:07.207892",
+        "corrigida": false
+      }
+    ]
+  }
+}

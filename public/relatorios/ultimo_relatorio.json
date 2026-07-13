@@ -1,110 +1,26 @@
 {
-  "alvo": "https://app.melver.com.br",
-  "gerado_em": "2026-07-13T20:50:31.219168",
+  "alvo": "https://www.tetrapak.com.br",
+  "gerado_em": "2026-07-13T21:09:17.104177",
   "metricas": {
-    "TOTAL": 12,
+    "TOTAL": 4,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 8,
+    "ALTA": 1,
     "MEDIA": 2,
-    "BAIXA": 2
+    "BAIXA": 1
   },
   "categorias": {
-    "A01": [
+    "A02": [
       {
-        "identificador": "A01-PATH-admin",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /admin",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/admin",
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.tetrapak.com.br",
         "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:25.191152",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-admin_login",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /admin/login",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/admin/login",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:26.040150",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-.env",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /.env",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/.env",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 397 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:26.789686",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-.git_config",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /.git/config",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/.git/config",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:27.407119",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-phpmyadmin",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /phpmyadmin/",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/phpmyadmin/",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:28.049928",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-server-status",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /server-status",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/server-status",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:28.731424",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-actuator",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /actuator",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/actuator",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:29.370859",
-        "corrigida": false
-      },
-      {
-        "identificador": "A01-PATH-debug",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /debug",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://app.melver.com.br/debug",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 8219 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-13T20:50:30.101279",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-13T21:09:07.207661",
         "corrigida": false
       }
     ],
@@ -114,11 +30,11 @@
         "categoria": "A05",
         "titulo": "Sem Content-Security-Policy",
         "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
-        "ativo": "https://app.melver.com.br",
+        "ativo": "https://www.tetrapak.com.br",
         "severidade": "MEDIA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
         "mitigacao": "Definir política CSP restritiva.",
-        "descoberta_em": "2026-07-13T20:50:24.108053",
+        "descoberta_em": "2026-07-13T21:09:07.207862",
         "corrigida": false
       },
       {
@@ -126,23 +42,11 @@
         "categoria": "A05",
         "titulo": "Sem X-Frame-Options",
         "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
-        "ativo": "https://app.melver.com.br",
+        "ativo": "https://www.tetrapak.com.br",
         "severidade": "MEDIA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
         "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
-        "descoberta_em": "2026-07-13T20:50:24.108099",
-        "corrigida": false
-      },
-      {
-        "identificador": "A05-HDR-X-Content-Type-Options",
-        "categoria": "A05",
-        "titulo": "Sem X-Content-Type-Options",
-        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
-        "ativo": "https://app.melver.com.br",
-        "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
-        "mitigacao": "Definir 'nosniff'.",
-        "descoberta_em": "2026-07-13T20:50:24.108157",
+        "descoberta_em": "2026-07-13T21:09:07.207884",
         "corrigida": false
       },
       {
@@ -150,11 +54,11 @@
         "categoria": "A05",
         "titulo": "Sem Referrer-Policy",
         "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
-        "ativo": "https://app.melver.com.br",
+        "ativo": "https://www.tetrapak.com.br",
         "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Report-To', 'X-Cloud-Trace-Context', 'Strict-Transport-Security', 'Nel', 'Cf-Cache-Status', 'Content-Encoding', 'Server', 'CF-RAY']",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'ER-Request-ID', 'Pragma', 'Cache-Control', 'X-Content-Type-Options', 'ER-Rule-Id', 'Location', 'Content-Encoding', 'Server']",
         "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
-        "descoberta_em": "2026-07-13T20:50:24.108190",
+        "descoberta_em": "2026-07-13T21:09:07.207892",
         "corrigida": false
       }
     ]
