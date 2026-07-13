@@ -1,0 +1,28 @@
+{
+  "alvo": "https://cvefeed.io",
+  "gerado_em": "2026-07-13T18:20:44.735636",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://cvefeed.io",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Content-Language', 'Cross-Origin-Opener-Policy', 'Link', 'Referrer-Policy', 'Server', 'Strict-Transport-Security', 'Vary', 'X-Content-Type-Options', 'X-Frame-Options', 'Cf-Cache-Status', 'Speculation-Rules', 'Report-To', 'Nel', 'Content-Encoding', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T18:20:40.291804",
+        "corrigida": false
+      }
+    ]
+  }
+}

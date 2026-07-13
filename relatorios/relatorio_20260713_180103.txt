@@ -1,0 +1,11 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.guarulhos.sp.gov.br
+Gerado em (UTC): 2026-07-13T18:01:03.866037
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 0
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 0
+  - BAIXA     : 0
