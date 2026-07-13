@@ -14,6 +14,7 @@ Implementa as 6 etapas do processo de identificação:
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List
 
 from .utilidades import (
@@ -22,11 +23,28 @@ from .utilidades import (
 
 logger = obter_logger("gestao")
 
+
+def _garantir_diretorio(caminho: str) -> str:
+    """Cria o diretório quando ele ainda não existe, removendo links simbólicos quebrados."""
+    caminho_obj = Path(caminho)
+    if caminho_obj.exists() or caminho_obj.is_symlink():
+        if caminho_obj.is_dir():
+            return str(caminho_obj)
+        if caminho_obj.is_symlink():
+            try:
+                caminho_obj.unlink()
+            except FileNotFoundError:
+                pass
+        else:
+            raise FileExistsError(f"{caminho} existe e não é um diretório")
+
+    caminho_obj.mkdir(parents=True, exist_ok=True)
+    return str(caminho_obj)
+
+
 # Diretórios padrão dos relatórios
-DIR_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "relatorios")
-DIR_FRONTEND_RELATORIOS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "relatorios")
-os.makedirs(DIR_RELATORIOS, exist_ok=True)
-os.makedirs(DIR_FRONTEND_RELATORIOS, exist_ok=True)
+DIR_RELATORIOS = _garantir_diretorio(os.path.join(os.path.dirname(os.path.dirname(__file__)), "relatorios"))
+DIR_FRONTEND_RELATORIOS = _garantir_diretorio(os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "relatorios"))
 
 
 def categorizar(vulns: List[Vulnerabilidade]) -> Dict[str, List[Vulnerabilidade]]:
