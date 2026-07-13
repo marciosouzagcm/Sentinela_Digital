@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "sentinela-digital"
+version = "0.1.0"
+description = "Dashboard do Sentinela Digital"
+authors = ["Marcio Souza <seu-email@exemplo.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+# Adicione aqui suas bibliotecas, ex:
+# flask = "^3.0.0"
+# pandas = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
