@@ -1,13 +1,13 @@
 {
-  "alvo": "https://g1.globo.com",
-  "gerado_em": "2026-07-13T16:09:14.112607",
+  "alvo": "https://linktr.ee",
+  "gerado_em": "2026-07-13T16:46:29.361210",
   "metricas": {
-    "TOTAL": 4,
+    "TOTAL": 5,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 1,
-    "MEDIA": 2,
-    "BAIXA": 1
+    "ALTA": 5,
+    "MEDIA": 0,
+    "BAIXA": 0
   },
   "categorias": {
     "A02": [
@@ -16,51 +16,61 @@
         "categoria": "A02",
         "titulo": "Sem HSTS",
         "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
-        "ativo": "https://g1.globo.com",
+        "ativo": "https://linktr.ee",
         "severidade": "ALTA",
-        "evidencia": "Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']",
+        "evidencia": "Cabeçalhos recebidos: ['Connection', 'Content-Length', 'cache-control', 'x-nextjs-stale-time', 'x-content-type-options', 'etag', 'content-security-policy', 'x-nextjs-prerender', 'x-nextjs-cache', 'content-type', 'content-encoding', 'x-frame-options', 'Accept-Ranges', 'Date', 'Via', 'Age', 'X-Served-By', 'X-Cache', 'X-Cache-Hits', 'X-Timer', 'Vary', 'X-LT-Cache', 'Referrer-Policy', 'Link', 'X-Llms-Txt']",
         "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
-        "descoberta_em": "2026-07-13T16:09:12.813295",
+        "descoberta_em": "2026-07-13T16:46:22.777440",
         "corrigida": false
       }
     ],
-    "A05": [
+    "A01": [
       {
-        "identificador": "A05-HDR-X-Frame-Options",
-        "categoria": "A05",
-        "titulo": "Sem X-Frame-Options",
-        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
-        "ativo": "https://g1.globo.com",
-        "severidade": "MEDIA",
-        "evidencia": "Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']",
-        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
-        "descoberta_em": "2026-07-13T16:09:12.813490",
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://linktr.ee/admin",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 5884 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T16:46:22.911580",
         "corrigida": false
       },
       {
-        "identificador": "A05-HDR-Referrer-Policy",
-        "categoria": "A05",
-        "titulo": "Sem Referrer-Policy",
-        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
-        "ativo": "https://g1.globo.com",
-        "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['date', 'content-type', 'show-page-version', 'x-request-id', 'x-mobile', 'x-served-from', 'content-security-policy', 'x-content-type-options', 'x-xss-protection', 'expires', 'cache-control', 'content-encoding', 'x-location-rule', 'age', 'vary', 'x-cache-status', 'x-bip', 'via', 'accept-ranges', 'content-length']",
-        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
-        "descoberta_em": "2026-07-13T16:09:12.813504",
+        "identificador": "A01-PATH-admin_login",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin/login",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://linktr.ee/admin/login",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 5884 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T16:46:23.044467",
         "corrigida": false
-      }
-    ],
-    "A10": [
+      },
       {
-        "identificador": "A10-SSRF-PROBE",
-        "categoria": "A10",
-        "titulo": "Comportamento suspeito em parâmetro 'url' (possível SSRF)",
-        "descricao": "A resposta variou ao injetar URL interna em parâmetro comum.",
-        "ativo": "https://g1.globo.com",
-        "severidade": "MEDIA",
-        "evidencia": "Tamanhos: base=1001485, probe=1005216",
-        "mitigacao": "Validar destinos com whitelist e bloquear IPs internos.",
-        "descoberta_em": "2026-07-13T16:09:14.104221",
+        "identificador": "A01-PATH-actuator",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /actuator",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://linktr.ee/actuator",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 156494 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T16:46:26.111002",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://linktr.ee/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 132685 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-13T16:46:28.046787",
         "corrigida": false
       }
     ]
