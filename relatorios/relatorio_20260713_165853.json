@@ -1,0 +1,28 @@
+{
+  "alvo": "https://www.xpi.com.br",
+  "gerado_em": "2026-07-13T16:58:53.607942",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.xpi.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Mime-Version', 'Content-Length', 'Cache-control', 'Pragma', 'Expires', 'Content-Type', 'edge-rsp-blk', 'Date', 'Connection', 'X-Frame-Options', 'Feature-Policy', 'Permissions-Policy', 'Set-Cookie', 'Referrer-Policy', 'X-XSS-Protection', 'X-Content-Type-Options', 'Strict-Transport-Security']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-13T16:58:52.748928",
+        "corrigida": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://linktr.ee
+Gerado em (UTC): 2026-07-13T16:46:29.361210
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 5
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 5
+  - MEDIA     : 0
+  - BAIXA     : 0
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://linktr.ee
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Connection', 'Content-Length', 'cache-control', 'x-nextjs-stale-time', 'x-content-type-options', 'etag', 'content-security-policy', 'x-nextjs-prerender', 'x-nextjs-cache', 'content-type', 'content-encoding', 'x-frame-options', 'Accept-Ranges', 'Date', 'Via', 'Age', 'X-Served-By', 'X-Cache', 'X-Cache-Hits', 'X-Timer', 'Vary', 'X-LT-Cache', 'Referrer-Policy', 'Link', 'X-Llms-Txt']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A01] 4 achado(s)
+------------------------------------------------------------------------
+[ALTA] A01-PATH-admin - Recurso sensível acessível: /admin
+  Ativo    : https://linktr.ee/admin
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 5884 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[ALTA] A01-PATH-admin_login - Recurso sensível acessível: /admin/login
+  Ativo    : https://linktr.ee/admin/login
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 5884 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[ALTA] A01-PATH-actuator - Recurso sensível acessível: /actuator
+  Ativo    : https://linktr.ee/actuator
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 156494 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[ALTA] A01-PATH-debug - Recurso sensível acessível: /debug
+  Ativo    : https://linktr.ee/debug
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 132685 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
