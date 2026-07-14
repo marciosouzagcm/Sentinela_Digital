@@ -10,7 +10,7 @@ import threading
 import uvicorn
 from typing import List
 
-# Ajuste crítico para garantir que o Python encontre o nmap no venv
+# Ajuste de caminho (mantenha se necessário no seu ambiente)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'venv/lib/python3.14/site-packages')))
 
 from fastapi import FastAPI
@@ -33,7 +33,6 @@ except ModuleNotFoundError:
 logger = obter_logger("main")
 
 def _obter_origins_permitidos() -> list[str]:
-    # Adicionada a URL da sua Vercel para permitir comunicação com o dashboard
     default_origins = "http://localhost:5173,http://127.0.0.1:5173,https://sentineladigital-seven.vercel.app"
     raw_value = os.getenv("CORS_ALLOWED_ORIGINS", default_origins)
     return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
@@ -65,14 +64,8 @@ def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidad
     logger.info(f"Ciclo concluído: {len(achados)} achados.")
     return achados
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Scanner de Vulnerabilidades.")
-    parser.add_argument("--alvo", required=True)
-    parser.add_argument("--codigo", default=None)
-    parser.add_argument("--continuo", type=int, default=0)
-    parser.add_argument("--sniffer", action="store_true")
-    args = parser.parse_args()
-
+def main_loop(args) -> None:
+    """Função separada para rodar o scanner contínuo."""
     sniff_thread = None
     if args.sniffer and iniciar_sniffer:
         logger.info("[*] Sniffer ativado.")
@@ -94,16 +87,25 @@ def main() -> None:
 
             if args.continuo <= 0: break
             time.sleep(args.continuo * 60)
-
-    except KeyboardInterrupt:
-        logger.info("Encerrando ciclo...")
+    except Exception as e:
+        logger.error(f"Erro no ciclo: {e}")
     finally:
         parar_sniff.set()
         if sniff_thread:
             sniff_thread.join(timeout=3.0)
-        logger.info("Sistema finalizado com sucesso.")
+        logger.info("Sistema finalizado.")
 
 if __name__ == "__main__":
-    # Rodar API em thread separada
-    threading.Thread(target=lambda: uvicorn.run(app, host="127.0.0.1", port=8000), daemon=True).start()
-    main()
+    parser = argparse.ArgumentParser(description="Scanner de Vulnerabilidades.")
+    parser.add_argument("--alvo", required=True)
+    parser.add_argument("--codigo", default=None)
+    parser.add_argument("--continuo", type=int, default=0)
+    parser.add_argument("--sniffer", action="store_true")
+    args = parser.parse_args()
+
+    # Inicia o Scanner em thread separada para não bloquear o servidor web
+    threading.Thread(target=main_loop, args=(args,), daemon=True).start()
+
+    # Configuração correta para Render/Nuvem
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
