@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "mkdir -p public/relatorios && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },

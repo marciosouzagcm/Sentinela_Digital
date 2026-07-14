@@ -1,0 +1,29 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://havaianas.com.br
+Gerado em (UTC): 2026-07-14T15:50:02.110368
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 2
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 0
+  - BAIXA     : 1
+
+[A01] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A01-PATH-.env - Recurso sensível acessível: /.env
+  Ativo    : https://havaianas.com.br/.env
+  Descrição: Caminho administrativo respondeu 200 sem autenticação.
+  Evidência: HTTP 200, 2161438 bytes
+  Mitigação: Restringir o acesso por autenticação/ACL ou remover.
+
+[A05] 1 achado(s)
+------------------------------------------------------------------------
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://havaianas.com.br
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Nel', 'X-Permitted-Cross-Domain-Policies', 'X-XSS-Protection', 'cf-cache-status', 'x-request-id', 'link', 'shopify-complexity-score', 'shopify-complexity-score-v2', 'x-frame-options', 'content-security-policy', 'strict-transport-security', 'server', 'Report-To', 'vary', 'Alt-Svc', 'content-language', 'x-shopify-perf-experiments', 'powered-by', 'server-timing', 'X-Download-Options', 'x-dc', 'X-Content-Type-Options', 'set-cookie', 'content-encoding', 'CF-RAY']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
