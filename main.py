@@ -45,6 +45,7 @@ def health(): return {"status": "ok"}
 
 @app.get("/relatorios/ultimo")
 def relatorio_ultimo(): 
+    # Retorna o dicionário do último relatório ou um objeto vazio caso não exista
     return obter_ultimo_relatorio() or {}
 
 def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidade]:
@@ -66,14 +67,28 @@ def main() -> None:
     parser.add_argument("--sniffer", action="store_true")
     args = parser.parse_args()
 
-    # ... (restante da sua lógica de sniffer e loop mantida)
+    # Inicia o sniffer se solicitado
+    if args.sniffer and iniciar_sniffer:
+        threading.Thread(target=iniciar_sniffer, args=(parar_sniff,), daemon=True).start()
+
+    # Loop principal de escaneamento
     while True:
         atuais = executar_ciclo(args.alvo, args.codigo)
-        consolidados = reavaliar([], atuais) # Simplificado para exemplo
+        consolidados = reavaliar([], atuais) 
         gerar_relatorio(priorizar(consolidados), args.alvo)
-        if args.continuo <= 0: break
+        
+        if args.continuo <= 0: 
+            break
+        
         time.sleep(args.continuo * 60)
 
 if __name__ == "__main__":
-    threading.Thread(target=lambda: uvicorn.run(app, host="0.0.0.0", port=10000), daemon=True).start()
+    # Inicia a API FastAPI em uma thread separada (daemon)
+    api_thread = threading.Thread(
+        target=lambda: uvicorn.run(app, host="0.0.0.0", port=10000), 
+        daemon=True
+    )
+    api_thread.start()
+    
+    # Executa o loop principal de escaneamento no processo principal
     main()
