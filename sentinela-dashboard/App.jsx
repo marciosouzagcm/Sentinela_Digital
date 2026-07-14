@@ -9,12 +9,13 @@ function App() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        // O cache buster ?t=${Date.now()} força uma nova requisição a cada 3 segundos
-        const resposta = await fetch(`/relatorios/ultimo_relatorio.json?t=${Date.now()}`);
+        // Aponte para a URL do seu backend no Render
+        const API_URL = 'https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo';
+        
+        const resposta = await fetch(API_URL);
         
         if (resposta.ok) {
           const dados = await resposta.json();
-          // Atualiza o estado apenas se os dados forem diferentes do atual
           setRelatorio(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(dados)) {
               return dados;
@@ -24,12 +25,13 @@ function App() {
           setUltimaAtualizacao(new Date());
         }
       } catch (err) {
-        console.error("Erro ao carregar relatório:", err);
+        console.error("Erro ao carregar relatório do backend:", err);
       }
     };
 
     carregarDados();
-    const intervalo = setInterval(carregarDados, 3000);
+    // Intervalo de 5 segundos para atualizar a tela
+    const intervalo = setInterval(carregarDados, 5000);
     return () => clearInterval(intervalo);
   }, []);
 
@@ -44,17 +46,14 @@ function App() {
       </header>
 
       <main>
-        {relatorio ? (
-          // A 'key' abaixo é o segredo: ela força o React a re-renderizar o ReportViewer 
-          // toda vez que o alvo ou a data de geração mudar.
+        {relatorio && Object.keys(relatorio).length > 0 ? (
           <ReportViewer 
             key={`${relatorio.alvo}-${relatorio.gerado_em}`} 
             data={relatorio} 
           />
         ) : (
           <div className="text-center text-gray-500">
-            <p>Aguardando dados...</p>
-            <p className="text-sm">Verifique se o backend Python está gerando o JSON em /public/relatorios/</p>
+            <p>Aguardando dados do servidor...</p>
           </div>
         )}
       </main>
