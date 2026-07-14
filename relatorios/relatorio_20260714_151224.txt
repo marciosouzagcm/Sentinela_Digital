@@ -1,0 +1,7 @@
+RELATÓRIO DE VULNERABILIDADES - https://bidweb.com.br
+Gerado em: 2026-07-14T15:12:24.529082
+
+[A05]
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Mitigação: Definir política CSP restritiva.
+

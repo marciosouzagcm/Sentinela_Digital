@@ -1,0 +1,25 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.uber.com
+Gerado em (UTC): 2026-07-14T13:01:06.215118
+========================================================================
+MÉTRICAS:
+  - TOTAL     : 2
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 1
+
+[A05] 2 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.uber.com
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'CF-RAY', 'Set-Cookie', 'x-envoy-upstream-service-time', 'x-frame-options', 'Cache-Control', 'strict-transport-security', 'x-content-type-options', 'cf-cache-status', 'Vary', 'x-uber-edge', 'Server']
+  Mitigação: Definir política CSP restritiva.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.uber.com
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'CF-RAY', 'Set-Cookie', 'x-envoy-upstream-service-time', 'x-frame-options', 'Cache-Control', 'strict-transport-security', 'x-content-type-options', 'cf-cache-status', 'Vary', 'x-uber-edge', 'Server']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.

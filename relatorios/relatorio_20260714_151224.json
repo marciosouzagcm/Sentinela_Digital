@@ -1,0 +1,28 @@
+{
+  "alvo": "https://bidweb.com.br",
+  "gerado_em": "2026-07-14T15:12:24.529082",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://bidweb.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Strict-Transport-Security', 'Vary', 'Cache-Control', 'Last-Modified', 'x-content-type-options', 'x-xss-protection', 'x-frame-options', 'Cf-Cache-Status', 'Report-To', 'Nel', 'expect-ct', 'referrer-policy', 'Content-Encoding', 'CF-RAY']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-14T15:12:19.159135",
+        "corrigida": false
+      }
+    ]
+  }
+}

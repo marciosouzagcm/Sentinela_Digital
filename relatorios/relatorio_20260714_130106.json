@@ -1,0 +1,40 @@
+{
+  "alvo": "https://www.uber.com",
+  "gerado_em": "2026-07-14T13:01:06.215118",
+  "metricas": {
+    "TOTAL": 2,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.uber.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'CF-RAY', 'Set-Cookie', 'x-envoy-upstream-service-time', 'x-frame-options', 'Cache-Control', 'strict-transport-security', 'x-content-type-options', 'cf-cache-status', 'Vary', 'x-uber-edge', 'Server']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-14T13:01:03.417199",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.uber.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'CF-RAY', 'Set-Cookie', 'x-envoy-upstream-service-time', 'x-frame-options', 'Cache-Control', 'strict-transport-security', 'x-content-type-options', 'cf-cache-status', 'Vary', 'x-uber-edge', 'Server']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-14T13:01:03.417266",
+        "corrigida": false
+      }
+    ]
+  }
+}

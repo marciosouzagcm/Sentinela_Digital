@@ -1,0 +1,40 @@
+{
+  "alvo": "https://www.cielo.com.br",
+  "gerado_em": "2026-07-14T14:15:17.302979",
+  "metricas": {
+    "TOTAL": 2,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.cielo.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Server', 'X-Frame-Options', 'Strict-Transport-Security', 'X-XSS-Protection', 'X-Content-Type-Options', 'Last-Modified', 'ETag', 'Accept-Ranges', 'X-Akamai-Transformed', 'Vary', 'Content-Encoding', 'Date', 'Transfer-Encoding', 'Connection', 'Server-Timing', 'Set-Cookie']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-14T14:15:15.751108",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.cielo.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Server', 'X-Frame-Options', 'Strict-Transport-Security', 'X-XSS-Protection', 'X-Content-Type-Options', 'Last-Modified', 'ETag', 'Accept-Ranges', 'X-Akamai-Transformed', 'Vary', 'Content-Encoding', 'Date', 'Transfer-Encoding', 'Connection', 'Server-Timing', 'Set-Cookie']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-14T14:15:15.751132",
+        "corrigida": false
+      }
+    ]
+  }
+}

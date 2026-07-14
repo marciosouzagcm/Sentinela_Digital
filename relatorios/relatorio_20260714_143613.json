@@ -1,0 +1,88 @@
+{
+  "alvo": "https://hackersdobem.org.br",
+  "gerado_em": "2026-07-14T14:36:13.294498",
+  "metricas": {
+    "TOTAL": 6,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 6,
+    "MEDIA": 0,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-admin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/admin",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:11.997691",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-admin_login",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin/login",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/admin/login",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:12.221921",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-phpmyadmin",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /phpmyadmin/",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/phpmyadmin/",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:12.566860",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-server-status",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /server-status",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/server-status",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:12.734480",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-actuator",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /actuator",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/actuator",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:12.963674",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-debug",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /debug",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://hackersdobem.org.br/debug",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 2597 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T14:36:13.141564",
+        "corrigida": false
+      }
+    ]
+  }
+}

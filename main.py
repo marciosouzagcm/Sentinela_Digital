@@ -2,12 +2,17 @@
 """
 Scanner de Vulnerabilidades — ponto de entrada (CLI + API).
 """
-import argparse
+import sys
 import os
+import argparse
 import time
 import threading
 import uvicorn
 from typing import List
+
+# Ajuste crítico para garantir que o Python encontre o nmap no venv
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'venv/lib/python3.14/site-packages')))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from modulos.utilidades import obter_logger, Vulnerabilidade
@@ -28,10 +33,13 @@ except ModuleNotFoundError:
 logger = obter_logger("main")
 
 def _obter_origins_permitidos() -> list[str]:
-    raw_value = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+    # Adicionada a URL da sua Vercel para permitir comunicação com o dashboard
+    default_origins = "http://localhost:5173,http://127.0.0.1:5173,https://sentineladigital-seven.vercel.app"
+    raw_value = os.getenv("CORS_ALLOWED_ORIGINS", default_origins)
     return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
 
 app = FastAPI(title="Sentinela Digital API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_obter_origins_permitidos(),
@@ -83,14 +91,13 @@ def main() -> None:
             caminhos = gerar_relatorio(priorizar(consolidados), args.alvo)
             logger.info(f"Relatório JSON: {caminhos['json']}")
             anteriores = [v for v in atuais if not v.corrigida]
-            
+
             if args.continuo <= 0: break
             time.sleep(args.continuo * 60)
-            
+
     except KeyboardInterrupt:
         logger.info("Encerrando ciclo...")
     finally:
-        # Finalização segura
         parar_sniff.set()
         if sniff_thread:
             sniff_thread.join(timeout=3.0)
