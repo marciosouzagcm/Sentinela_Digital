@@ -12,7 +12,7 @@ function App() {
       try {
         setDebug("Buscando dados no servidor...");
         // URL corrigida para o caminho exato do arquivo estático no Render
-        const API_URL = `https://sentinela-digital-cxk8.onrender.com/public/relatorios/ultimo_relatorio.json?t=${Date.now()}`;
+        const API_URL = `https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo?t=${Date.now()}`
         
         const resposta = await fetch(API_URL);
         
