@@ -11,24 +11,31 @@ function App() {
     const carregarDados = async () => {
       try {
         setDebug("Buscando dados no servidor...");
-        // URL corrigida para o caminho exato do arquivo estático no Render
-        const API_URL = `https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo?t=${Date.now()}`
         
-        const resposta = await fetch(API_URL);
+        // URL absoluta para a sua API FastAPI no Render
+        // Inclui o 't' para evitar cache do navegador
+        const API_URL = `https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo?t=${Date.now()}`;
+        
+        const resposta = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
         
         if (!resposta.ok) {
-          throw new Error(`HTTP ${resposta.status}`);
+          throw new Error(`Erro HTTP: ${resposta.status}`);
         }
         
         const dados = await resposta.json();
         
-        // Verifica se o objeto recebido possui a estrutura mínima esperada
-        if (dados && (dados.alvo || dados.categorias)) {
+        // Validação básica: verifica se o objeto não está vazio
+        if (dados && Object.keys(dados).length > 0) {
           setRelatorio(dados);
           setUltimaAtualizacao(new Date());
           setDebug("Dados carregados com sucesso.");
         } else {
-          setDebug("Dados recebidos, mas o formato é inválido.");
+          setDebug("Nenhum relatório disponível no momento.");
         }
       } catch (err) {
         console.error("Erro na busca da API:", err);
@@ -36,12 +43,13 @@ function App() {
       }
     };
 
-    // Execução inicial
+    // Executa a primeira vez
     carregarDados();
     
-    // Atualização automática a cada 10 segundos
+    // Configura o intervalo de atualização para 10 segundos
     const intervalo = setInterval(carregarDados, 10000);
     
+    // Limpa o intervalo ao desmontar o componente
     return () => clearInterval(intervalo);
   }, []);
 
@@ -62,7 +70,7 @@ function App() {
           <div className="bg-white p-10 rounded-lg shadow-sm text-center border border-gray-200">
             <p className="text-gray-500">Aguardando dados do monitoramento...</p>
             <p className="text-xs text-gray-400 mt-2">
-              Se o status mostrar erro, verifique as permissões de CORS no Render.
+              Se o status mostrar erro, verifique o console do navegador (F12).
             </p>
           </div>
         )}
