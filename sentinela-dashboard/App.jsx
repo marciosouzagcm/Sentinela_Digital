@@ -10,9 +10,10 @@ function App() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        setDebug("Buscando dados...");
-        // O parâmetro 't' (cache buster) garante que o navegador busque sempre o arquivo novo
-        const API_URL = `https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo?t=${Date.now()}`;
+        setDebug("Buscando dados no servidor...");
+        // URL corrigida para o caminho exato do arquivo estático no Render
+        const API_URL = `https://sentinela-digital-cxk8.onrender.com/public/relatorios/ultimo_relatorio.json?t=${Date.now()}`;
+        
         const resposta = await fetch(API_URL);
         
         if (!resposta.ok) {
