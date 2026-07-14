@@ -5,17 +5,24 @@ import StatusIndicator from './components/StatusIndicator';
 function App() {
   const [relatorio, setRelatorio] = useState(null);
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState(null);
+  const [erro, setErro] = useState(false);
 
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        // Aponte para a URL do seu backend no Render
+        // Aponte para a URL correta do seu backend no Render
         const API_URL = 'https://sentinela-digital-cxk8.onrender.com/relatorios/ultimo';
         
         const resposta = await fetch(API_URL);
         
-        if (resposta.ok) {
-          const dados = await resposta.json();
+        if (!resposta.ok) {
+          throw new Error('Falha na resposta do servidor');
+        }
+
+        const dados = await resposta.json();
+        
+        // Verifica se os dados não estão vazios antes de atualizar
+        if (dados && Object.keys(dados).length > 0) {
           setRelatorio(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(dados)) {
               return dados;
@@ -23,15 +30,20 @@ function App() {
             return prev;
           });
           setUltimaAtualizacao(new Date());
+          setErro(false);
         }
       } catch (err) {
         console.error("Erro ao carregar relatório do backend:", err);
+        setErro(true);
       }
     };
 
+    // Primeira chamada imediata
     carregarDados();
+    
     // Intervalo de 5 segundos para atualizar a tela
     const intervalo = setInterval(carregarDados, 5000);
+    
     return () => clearInterval(intervalo);
   }, []);
 
@@ -46,14 +58,18 @@ function App() {
       </header>
 
       <main>
-        {relatorio && Object.keys(relatorio).length > 0 ? (
+        {relatorio ? (
           <ReportViewer 
             key={`${relatorio.alvo}-${relatorio.gerado_em}`} 
             data={relatorio} 
           />
         ) : (
           <div className="text-center text-gray-500">
-            <p>Aguardando dados do servidor...</p>
+            {erro ? (
+              <p className="text-red-500">Erro ao conectar com o servidor. Verifique o console.</p>
+            ) : (
+              <p>Aguardando dados do servidor...</p>
+            )}
           </div>
         )}
       </main>
