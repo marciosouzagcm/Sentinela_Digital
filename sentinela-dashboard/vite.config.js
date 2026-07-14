@@ -10,5 +10,10 @@ export default defineConfig({
     hmr: {
       overlay: false,
     }
+  },
+  build: {
+    // Isso impede que o Vite tente deletar a pasta de relatórios
+    // durante o processo de build, evitando o erro de diretório
+    emptyOutDir: false,
   }
 })
