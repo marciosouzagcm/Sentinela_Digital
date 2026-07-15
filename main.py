@@ -10,7 +10,7 @@ import threading
 import uvicorn
 from typing import List
 
-# Ajuste de caminho (mantenha se necessário no seu ambiente)
+# Ajuste de caminho
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'venv/lib/python3.14/site-packages')))
 
 from fastapi import FastAPI
@@ -22,7 +22,6 @@ from modulos.analise_codigo import analisar_diretorio
 from modulos.pentest import pentest_web
 from modulos.gestao import gerar_relatorio, reavaliar, priorizar, obter_ultimo_relatorio
 
-# Evento para sinalizar o encerramento seguro
 parar_sniff = threading.Event()
 
 try:
@@ -65,15 +64,10 @@ def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidad
     return achados
 
 def main_loop(args) -> None:
-    """Função separada para rodar o scanner contínuo."""
     sniff_thread = None
     if args.sniffer and iniciar_sniffer:
         logger.info("[*] Sniffer ativado.")
-        sniff_thread = threading.Thread(
-            target=iniciar_sniffer, 
-            args=("ens33", parar_sniff), 
-            daemon=True
-        )
+        sniff_thread = threading.Thread(target=iniciar_sniffer, args=("ens33", parar_sniff), daemon=True)
         sniff_thread.start()
 
     try:
@@ -81,19 +75,21 @@ def main_loop(args) -> None:
         while True:
             atuais = executar_ciclo(args.alvo, args.codigo)
             consolidados = reavaliar(anteriores, atuais)
+            
+            # A função gerar_relatorio já se encarrega da persistência no TiDB (relatório estruturado)
             caminhos = gerar_relatorio(priorizar(consolidados), args.alvo)
+            
             logger.info(f"Relatório JSON: {caminhos['json']}")
             anteriores = [v for v in atuais if not v.corrigida]
 
             if args.continuo <= 0: break
             time.sleep(args.continuo * 60)
-    except Exception as e:
-        logger.error(f"Erro no ciclo: {e}")
     finally:
         parar_sniff.set()
-        if sniff_thread:
-            sniff_thread.join(timeout=3.0)
+        if sniff_thread: sniff_thread.join(timeout=3.0)
         logger.info("Sistema finalizado.")
+        if args.continuo <= 0:
+            os._exit(0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scanner de Vulnerabilidades.")
@@ -103,9 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--sniffer", action="store_true")
     args = parser.parse_args()
 
-    # Inicia o Scanner em thread separada para não bloquear o servidor web
     threading.Thread(target=main_loop, args=(args,), daemon=True).start()
 
-    # Configuração correta para Render/Nuvem
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
