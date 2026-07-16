@@ -1,0 +1,90 @@
+{
+  "alvo": "https://www.conveniodesaude.com.br",
+  "gerado_em": "2026-07-15T18:52:08.914217",
+  "metricas": {
+    "TOTAL": 6,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 3,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.conveniodesaude.com.br",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'X-UA-Compatible', 'X-Redirect-By', 'Location', 'Content-Length', 'Keep-Alive', 'Connection', 'Content-Type']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-15T18:52:01.298366",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-PORTA-3306",
+        "categoria": "A05",
+        "titulo": "Serviço sensível exposto na porta 3306",
+        "descricao": "MySQL acessível externamente. Serviço detectado: mysql.",
+        "ativo": "www.conveniodesaude.com.br:3306",
+        "severidade": "MEDIA",
+        "evidencia": "{'porta': 3306, 'servico': 'mysql', 'produto': 'MariaDB', 'versao': '10.3.23 or earlier'}",
+        "mitigacao": "Restringir bind-address e revisar contas.",
+        "descoberta_em": "2026-07-15T18:52:00.257063",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.conveniodesaude.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'X-UA-Compatible', 'X-Redirect-By', 'Location', 'Content-Length', 'Keep-Alive', 'Connection', 'Content-Type']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-15T18:52:01.298403",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.conveniodesaude.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'X-UA-Compatible', 'X-Redirect-By', 'Location', 'Content-Length', 'Keep-Alive', 'Connection', 'Content-Type']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-15T18:52:01.298420",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.conveniodesaude.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'X-UA-Compatible', 'X-Redirect-By', 'Location', 'Content-Length', 'Keep-Alive', 'Connection', 'Content-Type']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-15T18:52:01.298435",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.conveniodesaude.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Server', 'X-UA-Compatible', 'X-Redirect-By', 'Location', 'Content-Length', 'Keep-Alive', 'Connection', 'Content-Type']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-15T18:52:01.298449",
+        "corrigida": false
+      }
+    ]
+  }
+}

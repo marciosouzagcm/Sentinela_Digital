@@ -1,0 +1,64 @@
+{
+  "alvo": "https://www.dell.com",
+  "gerado_em": "2026-07-16T14:33:01.009800",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 2,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.dell.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Location', 'Server-Timing', 'Rule', 'http_X_ISO_cn', 'X-Akamai-Transformed', 'Date', 'Connection', 'Set-Cookie', 'Alt-Svc', 'Akamai-Request-BC', 'X-Akamai-ERPolicy', 'X-Akamai-ERRuleID', 'Akamai-Cache-Status', 'X-Akamai-RTT-Value', 'X-Akamai-RTT', 'Strict-Transport-Security', 'Accept-CH', 'Permissions-Policy']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-16T14:32:59.514588",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.dell.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Location', 'Server-Timing', 'Rule', 'http_X_ISO_cn', 'X-Akamai-Transformed', 'Date', 'Connection', 'Set-Cookie', 'Alt-Svc', 'Akamai-Request-BC', 'X-Akamai-ERPolicy', 'X-Akamai-ERRuleID', 'Akamai-Cache-Status', 'X-Akamai-RTT-Value', 'X-Akamai-RTT', 'Strict-Transport-Security', 'Accept-CH', 'Permissions-Policy']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-16T14:32:59.514607",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.dell.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Location', 'Server-Timing', 'Rule', 'http_X_ISO_cn', 'X-Akamai-Transformed', 'Date', 'Connection', 'Set-Cookie', 'Alt-Svc', 'Akamai-Request-BC', 'X-Akamai-ERPolicy', 'X-Akamai-ERRuleID', 'Akamai-Cache-Status', 'X-Akamai-RTT-Value', 'X-Akamai-RTT', 'Strict-Transport-Security', 'Accept-CH', 'Permissions-Policy']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-16T14:32:59.514615",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.dell.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Content-Type', 'Location', 'Server-Timing', 'Rule', 'http_X_ISO_cn', 'X-Akamai-Transformed', 'Date', 'Connection', 'Set-Cookie', 'Alt-Svc', 'Akamai-Request-BC', 'X-Akamai-ERPolicy', 'X-Akamai-ERRuleID', 'Akamai-Cache-Status', 'X-Akamai-RTT-Value', 'X-Akamai-RTT', 'Strict-Transport-Security', 'Accept-CH', 'Permissions-Policy']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-16T14:32:59.514622",
+        "corrigida": false
+      }
+    ]
+  }
+}

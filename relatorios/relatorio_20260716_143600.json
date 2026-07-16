@@ -1,0 +1,54 @@
+{
+  "alvo": "https://www.b3.com",
+  "gerado_em": "2026-07-16T14:36:00.153448",
+  "metricas": {
+    "TOTAL": 3,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 1,
+    "MEDIA": 1,
+    "BAIXA": 1
+  },
+  "categorias": {
+    "A02": [
+      {
+        "identificador": "A02-HDR-Strict-Transport-Security",
+        "categoria": "A02",
+        "titulo": "Sem HSTS",
+        "descricao": "Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.",
+        "ativo": "https://www.b3.com",
+        "severidade": "ALTA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'Retry-After', 'Cache-Control', 'Expires', 'Referrer-Policy', 'X-Frame-Options', 'Server', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Adicionar Strict-Transport-Security com max-age >= 31536000.",
+        "descoberta_em": "2026-07-16T14:35:59.151172",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.b3.com",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'Retry-After', 'Cache-Control', 'Expires', 'Referrer-Policy', 'X-Frame-Options', 'Server', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-16T14:35:59.151191",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.b3.com",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Content-Length', 'Connection', 'Retry-After', 'Cache-Control', 'Expires', 'Referrer-Policy', 'X-Frame-Options', 'Server', 'CF-RAY', 'alt-svc']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-16T14:35:59.151199",
+        "corrigida": false
+      }
+    ]
+  }
+}

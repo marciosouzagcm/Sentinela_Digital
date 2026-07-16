@@ -1,42 +1,13 @@
 {
-  "alvo": "https://havaianas.com.br",
-  "gerado_em": "2026-07-14T15:50:02.110368",
+  "alvo": "https://www.opera.com",
+  "gerado_em": "2026-07-16T17:06:25.589137",
   "metricas": {
-    "TOTAL": 2,
+    "TOTAL": 0,
     "CORRIGIDAS": 0,
     "CRITICA": 0,
-    "ALTA": 1,
+    "ALTA": 0,
     "MEDIA": 0,
-    "BAIXA": 1
+    "BAIXA": 0
   },
-  "categorias": {
-    "A01": [
-      {
-        "identificador": "A01-PATH-.env",
-        "categoria": "A01",
-        "titulo": "Recurso sensível acessível: /.env",
-        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
-        "ativo": "https://havaianas.com.br/.env",
-        "severidade": "ALTA",
-        "evidencia": "HTTP 200, 2161438 bytes",
-        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
-        "descoberta_em": "2026-07-14T15:49:57.849863",
-        "corrigida": false
-      }
-    ],
-    "A05": [
-      {
-        "identificador": "A05-HDR-Referrer-Policy",
-        "categoria": "A05",
-        "titulo": "Sem Referrer-Policy",
-        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
-        "ativo": "https://havaianas.com.br",
-        "severidade": "BAIXA",
-        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Nel', 'X-Permitted-Cross-Domain-Policies', 'X-XSS-Protection', 'cf-cache-status', 'x-request-id', 'link', 'shopify-complexity-score', 'shopify-complexity-score-v2', 'x-frame-options', 'content-security-policy', 'strict-transport-security', 'server', 'Report-To', 'vary', 'Alt-Svc', 'content-language', 'x-shopify-perf-experiments', 'powered-by', 'server-timing', 'X-Download-Options', 'x-dc', 'X-Content-Type-Options', 'set-cookie', 'content-encoding', 'CF-RAY']",
-        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
-        "descoberta_em": "2026-07-14T15:49:55.666655",
-        "corrigida": false
-      }
-    ]
-  }
+  "categorias": {}
 }

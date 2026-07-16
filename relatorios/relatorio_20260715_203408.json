@@ -1,0 +1,28 @@
+{
+  "alvo": "https://www.metro.sp.gov.br",
+  "gerado_em": "2026-07-15T20:34:08.800438",
+  "metricas": {
+    "TOTAL": 1,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 1,
+    "BAIXA": 0
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://www.metro.sp.gov.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Content-Encoding', 'Strict-Transport-Security', 'X-Powered-By', 'Link', 'X-XSS-Protection', 'X-Frame-Options', 'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy', 'x-azure-ref', 'Cache-Control', 'x-fd-int-roxy-purgeid', 'X-Cache-Info', 'X-Cache']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-15T20:33:59.039563",
+        "corrigida": false
+      }
+    ]
+  }
+}
