@@ -1,0 +1,5 @@
+Relatório de Vulnerabilidades - https://www.tuasaude.com
+Gerado em: 2026-07-14T14:45:55.166644
+----------------------------------------
+
+Categoria: A05

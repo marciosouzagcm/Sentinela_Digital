@@ -1,0 +1,53 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.mercadocar.com.br
+Gerado em (UTC): 2026-07-14T15:20:54.466493
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 6
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 2
+  - BAIXA     : 3
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 5 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Content-Length', 'Connection']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
+[BAIXA] A05-BANNER - Versão do servidor exposta no cabeçalho Server
+  Ativo    : https://www.mercadocar.com.br
+  Descrição: O cabeçalho Server revela a versão: 'Microsoft-Azure-Application-Gateway/v2'.
+  Evidência: Microsoft-Azure-Application-Gateway/v2
+  Mitigação: Ocultar/normalizar o cabeçalho Server.
+

@@ -1,0 +1,13 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://securityheaders.com
+Gerado em (UTC): 2026-07-15T17:51:36.321141
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 0
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 0
+  - BAIXA     : 0
+

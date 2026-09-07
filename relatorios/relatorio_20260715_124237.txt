@@ -1,0 +1,39 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://neofeed.com.br
+Gerado em (UTC): 2026-07-15T12:42:37.252438
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 4
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 2
+  - BAIXA     : 2
+
+[A05] 4 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://neofeed.com.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://neofeed.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://neofeed.com.br
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://neofeed.com.br
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+

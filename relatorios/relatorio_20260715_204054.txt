@@ -1,0 +1,21 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.lance.com.br
+Gerado em (UTC): 2026-07-15T20:40:54.706210
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 1
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 1
+  - BAIXA     : 0
+
+[A05] 1 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.lance.com.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'vary', 'x-content-type-options', 'Cache-Control', 'x-frame-options', 'expires', 'x-xss-protection', 'Age', 'last-modified', 'cf-cache-status', 'link', 'Strict-Transport-Security', 'expect-ct', 'referrer-policy', 'Content-Encoding', 'Server', 'CF-RAY', 'alt-svc']
+  Mitigação: Definir política CSP restritiva.
+

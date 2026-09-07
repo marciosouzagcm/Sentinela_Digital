@@ -1,0 +1,7 @@
+Relatório de Vulnerabilidades - https://www.tuasaude.com
+Gerado em: 2026-07-14T14:49:59.613664
+----------------------------------------
+
+Categoria: A05
+ - [BAIXA] A05-BANNER: O cabeçalho Server revela a versão: 'nginx/1.24.0 (Ubuntu)'.
+

@@ -1,0 +1,90 @@
+{
+  "alvo": "https://www.siteconfiavel.com.br",
+  "gerado_em": "2026-07-14T15:08:57.293574",
+  "metricas": {
+    "TOTAL": 6,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 2,
+    "MEDIA": 1,
+    "BAIXA": 3
+  },
+  "categorias": {
+    "A01": [
+      {
+        "identificador": "A01-PATH-admin_login",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /admin/login",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://www.siteconfiavel.com.br/admin/login",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 12578 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T15:08:44.347127",
+        "corrigida": false
+      },
+      {
+        "identificador": "A01-PATH-.git_config",
+        "categoria": "A01",
+        "titulo": "Recurso sensível acessível: /.git/config",
+        "descricao": "Caminho administrativo respondeu 200 sem autenticação.",
+        "ativo": "https://www.siteconfiavel.com.br/.git/config",
+        "severidade": "ALTA",
+        "evidencia": "HTTP 200, 12578 bytes",
+        "mitigacao": "Restringir o acesso por autenticação/ACL ou remover.",
+        "descoberta_em": "2026-07-14T15:08:47.391380",
+        "corrigida": false
+      }
+    ],
+    "A05": [
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://www.siteconfiavel.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Set-Cookie', 'ETag', 'Vary', 'Content-Encoding', 'Expires', 'Cache-Control', 'X-Cache-Status', 'Strict-Transport-Security', 'Content-Security-Policy']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-14T15:08:41.036805",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://www.siteconfiavel.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Set-Cookie', 'ETag', 'Vary', 'Content-Encoding', 'Expires', 'Cache-Control', 'X-Cache-Status', 'Strict-Transport-Security', 'Content-Security-Policy']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-14T15:08:41.036825",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://www.siteconfiavel.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Server', 'Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Set-Cookie', 'ETag', 'Vary', 'Content-Encoding', 'Expires', 'Cache-Control', 'X-Cache-Status', 'Strict-Transport-Security', 'Content-Security-Policy']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-14T15:08:41.036833",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-BANNER",
+        "categoria": "A05",
+        "titulo": "Versão do servidor exposta no cabeçalho Server",
+        "descricao": "O cabeçalho Server revela a versão: 'nginx/1.25.4'.",
+        "ativo": "https://www.siteconfiavel.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "nginx/1.25.4",
+        "mitigacao": "Ocultar/normalizar o cabeçalho Server.",
+        "descoberta_em": "2026-07-14T15:08:41.036848",
+        "corrigida": false
+      }
+    ]
+  }
+}

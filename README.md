@@ -53,6 +53,13 @@ Sentinela_Digital/
 ```bash
 git clone https://github.com/marciosouzagcm/Sentinela_Digital.git
 cd Sentinela_Digital
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Instale as dependências
+
+```bash
 pip install -r requirements.txt
 cd sentinela-dashboard
 npm install

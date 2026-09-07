@@ -74,7 +74,7 @@ def _sanitizar_email(email: str) -> str:
 
 def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[str, Any]:
     """Executa os adaptadores OSINT, isolando falhas por ferramenta."""
-    if "@" not in email or email.startswith("@") or email.endswith("@"): 
+    if "@" not in email or email.startswith("@") or email.endswith("@"):
         raise ValueError("Informe um endereço de e-mail válido.")
 
     raiz_relatorios = base_dir or Path(__file__).resolve().parent / "reports"
@@ -145,16 +145,19 @@ def main() -> None:
     # Loop principal de escaneamento
     while True:
         atuais = executar_ciclo(args.alvo, args.codigo)
-        consolidados = reavaliar([], atuais) 
+        consolidados = reavaliar([], atuais)
         gerar_relatorio(priorizar(consolidados), args.alvo)
-        
-        if args.continuo <= 0: 
+
+        if args.continuo <= 0:
             break
-        
         time.sleep(args.continuo * 60)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         main()
     else:
-        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=int(os.getenv("PORT", "8000")),
+        )

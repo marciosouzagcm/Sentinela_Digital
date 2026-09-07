@@ -1,0 +1,13 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.bmjbaby.com.br
+Gerado em (UTC): 2026-07-14T15:17:36.647778
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 0
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 0
+  - MEDIA     : 0
+  - BAIXA     : 0
+

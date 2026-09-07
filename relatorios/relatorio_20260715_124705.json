@@ -1,0 +1,64 @@
+{
+  "alvo": "https://neofeed.com.br",
+  "gerado_em": "2026-07-15T12:47:05.558471",
+  "metricas": {
+    "TOTAL": 4,
+    "CORRIGIDAS": 0,
+    "CRITICA": 0,
+    "ALTA": 0,
+    "MEDIA": 2,
+    "BAIXA": 2
+  },
+  "categorias": {
+    "A05": [
+      {
+        "identificador": "A05-HDR-Content-Security-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Content-Security-Policy",
+        "descricao": "Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.",
+        "ativo": "https://neofeed.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']",
+        "mitigacao": "Definir política CSP restritiva.",
+        "descoberta_em": "2026-07-15T12:47:01.154157",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Frame-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Frame-Options",
+        "descricao": "Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.",
+        "ativo": "https://neofeed.com.br",
+        "severidade": "MEDIA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']",
+        "mitigacao": "Definir DENY ou SAMEORIGIN para mitigar clickjacking.",
+        "descoberta_em": "2026-07-15T12:47:01.154188",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-X-Content-Type-Options",
+        "categoria": "A05",
+        "titulo": "Sem X-Content-Type-Options",
+        "descricao": "Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.",
+        "ativo": "https://neofeed.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']",
+        "mitigacao": "Definir 'nosniff'.",
+        "descoberta_em": "2026-07-15T12:47:01.154211",
+        "corrigida": false
+      },
+      {
+        "identificador": "A05-HDR-Referrer-Policy",
+        "categoria": "A05",
+        "titulo": "Sem Referrer-Policy",
+        "descricao": "Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.",
+        "ativo": "https://neofeed.com.br",
+        "severidade": "BAIXA",
+        "evidencia": "Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Keep-Alive', 'Set-Cookie', 'Last-Modified', 'Link', 'Strict-Transport-Security', 'X-GoCache-CacheStatus', 'Server', 'cache-control']",
+        "mitigacao": "Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.",
+        "descoberta_em": "2026-07-15T12:47:01.154223",
+        "corrigida": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+========================================================================
+RELATÓRIO DE VULNERABILIDADES - https://www.bb.com.br
+Gerado em (UTC): 2026-07-15T20:46:55.043746
+========================================================================
+
+MÉTRICAS:
+  - TOTAL     : 5
+  - CORRIGIDAS: 0
+  - CRITICA   : 0
+  - ALTA      : 1
+  - MEDIA     : 2
+  - BAIXA     : 2
+
+[A02] 1 achado(s)
+------------------------------------------------------------------------
+[ALTA] A02-HDR-Strict-Transport-Security - Sem HSTS
+  Ativo    : https://www.bb.com.br
+  Descrição: Cabeçalho HTTP 'Strict-Transport-Security' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Last-Modified', 'cf-cache-status', 'Cteonnt-Length', 'Cache-Control', 'vary', 'set-cookie', 'Content-Encoding', 'CF-RAY']
+  Mitigação: Adicionar Strict-Transport-Security com max-age >= 31536000.
+
+[A05] 4 achado(s)
+------------------------------------------------------------------------
+[MEDIA] A05-HDR-Content-Security-Policy - Sem Content-Security-Policy
+  Ativo    : https://www.bb.com.br
+  Descrição: Cabeçalho HTTP 'Content-Security-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Last-Modified', 'cf-cache-status', 'Cteonnt-Length', 'Cache-Control', 'vary', 'set-cookie', 'Content-Encoding', 'CF-RAY']
+  Mitigação: Definir política CSP restritiva.
+
+[MEDIA] A05-HDR-X-Frame-Options - Sem X-Frame-Options
+  Ativo    : https://www.bb.com.br
+  Descrição: Cabeçalho HTTP 'X-Frame-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Last-Modified', 'cf-cache-status', 'Cteonnt-Length', 'Cache-Control', 'vary', 'set-cookie', 'Content-Encoding', 'CF-RAY']
+  Mitigação: Definir DENY ou SAMEORIGIN para mitigar clickjacking.
+
+[BAIXA] A05-HDR-X-Content-Type-Options - Sem X-Content-Type-Options
+  Ativo    : https://www.bb.com.br
+  Descrição: Cabeçalho HTTP 'X-Content-Type-Options' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Last-Modified', 'cf-cache-status', 'Cteonnt-Length', 'Cache-Control', 'vary', 'set-cookie', 'Content-Encoding', 'CF-RAY']
+  Mitigação: Definir 'nosniff'.
+
+[BAIXA] A05-HDR-Referrer-Policy - Sem Referrer-Policy
+  Ativo    : https://www.bb.com.br
+  Descrição: Cabeçalho HTTP 'Referrer-Policy' não está presente na resposta.
+  Evidência: Cabeçalhos recebidos: ['Date', 'Content-Type', 'Transfer-Encoding', 'Connection', 'Server', 'Last-Modified', 'cf-cache-status', 'Cteonnt-Length', 'Cache-Control', 'vary', 'set-cookie', 'Content-Encoding', 'CF-RAY']
+  Mitigação: Definir 'no-referrer' ou 'strict-origin-when-cross-origin'.
+
