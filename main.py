@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from modules.osint.mod_emailharvester import run_emailharvester
 from modules.osint.mod_ghunt import run_ghunt
-from modules.osint.mod_gitrob import run_gitrob
+from modules.osint.mod_gitleaks import run_gitleaks
 from modules.osint.mod_h8mail import run_h8mail
 from modules.osint.mod_holehe import run_holehe
 from modules.osint.mod_maltego import run_maltego
@@ -89,7 +89,7 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
         ("emailharvester", run_emailharvester),
         ("sherlock", run_sherlock),
         ("maltego", run_maltego),
-        ("gitrob", run_gitrob),
+        ("gitleaks", run_gitleaks),
         ("ghunt", run_ghunt),
     ]
     relatorio_mestre: dict[str, Any] = {

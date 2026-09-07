@@ -23,7 +23,7 @@ O modo `--email` executa sequencialmente nove adaptadores independentes em `modu
 | `mod_emailharvester.py` | EmailHarvester |
 | `mod_sherlock.py` | Sherlock |
 | `mod_maltego.py` | Maltego |
-| `mod_gitrob.py` | Gitrob |
+| `mod_gitleaks.py` | Gitleaks |
 | `mod_ghunt.py` | GHunt |
 
 Cada adaptador usa `subprocess.run` sem `shell=True`, captura `stdout` e `stderr` em UTF-8, grava a saída bruta em `.txt`, trata ausência da ferramenta e timeout e retorna `status`, `output_file` e `data`. Uma falha individual não interrompe as demais etapas.
@@ -95,7 +95,7 @@ reports/osint_pessoa_example_com_20260907_120000/
 ├── emailharvester.txt
 ├── sherlock.txt
 ├── maltego.txt
-├── gitrob.txt
+├── gitleaks.txt
 ├── ghunt.txt
 └── relatorio_mestre.json
 ```
@@ -174,7 +174,7 @@ python main.py --help
 
 ## Stack
 
-Python, FastAPI, Uvicorn, React, Vite, Tailwind CSS, Scapy, Nmap, `pip-audit`, Holehe, h8mail, recon-ng, theHarvester, EmailHarvester, Sherlock, Maltego, Gitrob, GHunt, Render e Vercel.
+Python, FastAPI, Uvicorn, React, Vite, Tailwind CSS, Scapy, Nmap, `pip-audit`, Holehe, h8mail, recon-ng, theHarvester, EmailHarvester, Sherlock, Maltego, Gitleaks, GHunt, Render e Vercel.
 
 ## Licença
 
