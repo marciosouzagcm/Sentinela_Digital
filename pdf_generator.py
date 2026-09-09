@@ -15,6 +15,17 @@ from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, 
 
 ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 ASCII_BANNER_RE = re.compile(r"^(?:[\-=*_#/+|\\]{3,}|\s*[A-Z0-9_\-]{3,}\s*)$")
+CYBER_DARK = colors.HexColor("#0B192C")
+CYBER_CYAN = colors.HexColor("#00D2FF")
+CYBER_MUTED = colors.HexColor("#475569")
+CYBER_PANEL = colors.HexColor("#EAF8FF")
+CYBER_SOFT = colors.HexColor("#F4F8FB")
+CYBER_SUCCESS = colors.HexColor("#10B981")
+CYBER_WARNING = colors.HexColor("#F59E0B")
+CYBER_DANGER = colors.HexColor("#EF4444")
+CYBER_LOW = colors.HexColor("#A7F3D0")
+CYBER_MED = colors.HexColor("#FEF3C7")
+CYBER_HIGH = colors.HexColor("#FEE2E2")
 
 
 class NumberedCanvas(Canvas):
@@ -192,27 +203,95 @@ def _resumo_ferramenta(nome: str, detalhe: Any) -> dict[str, Any]:
     }
 
 
-def _calcular_score_exposicao(resumo: dict[str, Any]) -> int:
-    pesos = {
-        "success": 12,
-        "filtered": 28,
-        "skipped": 35,
-        "no_data": 42,
-        "warning": 60,
-        "auth_required": 75,
-        "error": 88,
-        "timeout": 82,
-        "unavailable": 90,
-        "unknown": 55,
-    }
-    if not resumo.get("ferramentas"):
-        return 50
+def _texto_limpo(linhas: list[str]) -> str:
+    return "\n".join(str(linha) for linha in linhas if str(linha)).lower()
 
-    total = 0
-    for detalhe in resumo["ferramentas"].values():
+
+def _tem_resultado_seguro(nome: str, linhas: list[str]) -> bool:
+    nome_norm = _nome_ferramenta(nome).lower()
+    texto = _texto_limpo(linhas)
+    tokens_seguro = (
+        "no leaks found",
+        "no result found",
+        "no findings found",
+        "sem vazamentos",
+        "nenhum vazamento",
+        "sem resultado",
+        "sem resultados",
+        "nenhuma conta ativa",
+        "not found",
+        "no active account",
+    )
+    if any(token in texto for token in tokens_seguro):
+        return True
+    if nome_norm == "gitleaks" and ("0 leaks" in texto or "0 findings" in texto):
+        return True
+    return False
+
+
+def _tem_achado_confirmado(nome: str, status: str, linhas: list[str]) -> bool:
+    if not linhas:
+        return False
+    nome_norm = _nome_ferramenta(nome).lower()
+    status_norm = str(status).strip().lower()
+    if status_norm in {"error", "timeout", "unavailable", "auth_required", "rate_limit", "skipped", "filtered"}:
+        return False
+    if _tem_resultado_seguro(nome, linhas):
+        return False
+
+    texto = _texto_limpo(linhas)
+    padroes = (
+        "[+]",
+        "found",
+        "breach",
+        "leak",
+        "vazamento",
+        "conta ativa",
+        "account active",
+        "perfil",
+        "account",
+        "password",
+        "senha",
+        "login",
+        "github.com",
+    )
+    if nome_norm in {"holehe", "h8mail"}:
+        return any(token in texto for token in ("[+]", "found", "breach", "leak", "vazamento", "conta ativa", "account active"))
+    return bool(linhas) and any(token in texto for token in padroes)
+
+
+def _contar_contas_ativas(nome: str, linhas: list[str]) -> int:
+    if not _tem_achado_confirmado(nome, "success", linhas):
+        return 0
+    texto = _texto_limpo(linhas)
+    if "[+]" in texto:
+        return max(1, texto.count("[+]"))
+    if "breach" in texto or "vazamento" in texto or "leak" in texto:
+        return 1
+    return 1
+
+
+def _calcular_score_exposicao(resumo: dict[str, Any]) -> int:
+    ferramentas = resumo.get("ferramentas", {}) or {}
+    if not ferramentas:
+        return 0
+
+    total_ferramentas = len(ferramentas)
+    positivos = 0
+    for nome, detalhe in ferramentas.items():
+        if not isinstance(detalhe, dict):
+            continue
         status = str(detalhe.get("status", "unknown")).strip().lower()
-        total += pesos.get(status, 55)
-    return max(0, min(100, int(round(total / len(resumo["ferramentas"])))))
+        linhas = _coletar_linhas((detalhe.get("data") or {}).get("lines", []))
+        if not linhas and detalhe.get("destaques"):
+            linhas = _coletar_linhas(detalhe.get("destaques", []))
+        if _tem_achado_confirmado(str(nome), status, linhas):
+            positivos += 1
+
+    if positivos == 0:
+        return 5
+    base = int(round((positivos / total_ferramentas) * 100))
+    return max(5, min(100, base))
 
 
 def _resumo_executivo(dados: dict[str, Any]) -> dict[str, Any]:
@@ -282,15 +361,17 @@ def _nivel_risco_geral(resumo: dict[str, Any]) -> tuple[str, list[str], int, int
         if not isinstance(detalhe, dict):
             continue
         status = str(detalhe.get("status", "unknown")).lower()
-        destaques = detalhe.get("destaques", []) or []
-        contas_ativas += len(destaques)
-        for linha in destaques:
-            if "@" in linha or "password" in linha.lower() or "senha" in linha.lower():
+        linhas = _coletar_linhas((detalhe.get("data") or {}).get("lines", []))
+        if not linhas and detalhe.get("destaques"):
+            linhas = _coletar_linhas(detalhe.get("destaques", []))
+        if not _tem_achado_confirmado(str(nome), status, linhas):
+            continue
+
+        contas_ativas += _contar_contas_ativas(str(nome), linhas)
+        for linha in linhas:
+            if "@" in linha or "password" in linha.lower() or "senha" in linha.lower() or "breach" in linha.lower():
                 credenciais_vazadas += 1
-        if status in {"error", "timeout", "unavailable", "auth_required", "rate_limit"}:
-            vetores.append(f"{nome}: falha de varredura ou autenticação incompleta.")
-        elif status in {"success", "warning"} and destaques:
-            vetores.append(f"{nome}: contas ou serviços relevantes foram localizados.")
+        vetores.append(f"{_nome_ferramenta(str(nome))}: vazamentos ou contas ativas confirmados.")
 
     if credenciais_vazadas >= 3 or contas_ativas >= 3 or len(vetores) >= 3:
         nivel = "ALTO"
@@ -434,12 +515,15 @@ def _capa_executiva(elements: list[Any], resumo: dict[str, Any]) -> None:
 
 def _rodape_pagina(canvas_obj, total_pages: int | None = None) -> None:
     canvas_obj.saveState()
-    canvas_obj.setFont("Helvetica", 8)
-    canvas_obj.setFillColor(colors.HexColor("#475569"))
+    canvas_obj.setLineWidth(0.5)
+    canvas_obj.setStrokeColor(CYBER_CYAN)
+    canvas_obj.line(42, 30, letter[0] - 42, 30)
+    canvas_obj.setFont("Helvetica-Bold", 8)
+    canvas_obj.setFillColor(CYBER_MUTED)
     pagina_atual = canvas_obj.getPageNumber()
     total = total_pages if total_pages is not None else pagina_atual
-    canvas_obj.drawRightString(letter[0] - 45, 20, f"Página {pagina_atual} de {total}")
-    canvas_obj.drawString(45, 20, "Confidencial — Sentinela Digital")
+    canvas_obj.drawString(45, 12, "CONFIDENCIAL - SENTINELA DIGITAL")
+    canvas_obj.drawRightString(letter[0] - 45, 12, f"Página {pagina_atual} de {total}")
     canvas_obj.restoreState()
 
 
@@ -450,10 +534,58 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
     nivel_risco, vetores, contas_ativas, credenciais_vazadas = _nivel_risco_geral(resumo)
 
     styles = getSampleStyleSheet()
-    titulo = ParagraphStyle("TituloExecutivo", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=18, textColor=colors.HexColor("#0B192C"), leading=22)
-    cabecalho = ParagraphStyle("Cabecalho", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, textColor=colors.HexColor("#0B192C"), leading=20)
-    texto_box = ParagraphStyle("BoxText", parent=styles["BodyText"], fontName="Helvetica-Bold", fontSize=11, textColor=colors.HexColor("#0F172A"), leading=16)
-    note_style = ParagraphStyle("Note", parent=styles["BodyText"], fontName="Helvetica", fontSize=10, textColor=colors.HexColor("#334155"), leading=14)
+    titulo = ParagraphStyle(
+        "TituloExecutivo",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=18,
+        textColor=CYBER_DARK,
+        leading=22,
+        spaceAfter=8,
+    )
+    cabecalho = ParagraphStyle(
+        "Cabecalho",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=13,
+        textColor=CYBER_DARK,
+        leading=18,
+        spaceBefore=6,
+        spaceAfter=8,
+    )
+    texto_box = ParagraphStyle(
+        "BoxText",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=10.5,
+        textColor=CYBER_DARK,
+        leading=14,
+    )
+    note_style = ParagraphStyle(
+        "Note",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9.5,
+        textColor=CYBER_MUTED,
+        leading=12,
+    )
+    meta_style = ParagraphStyle(
+        "Meta",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9,
+        textColor=CYBER_MUTED,
+        leading=12,
+        spaceAfter=2,
+    )
+    accent_style = ParagraphStyle(
+        "Accent",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=10,
+        textColor=CYBER_CYAN,
+        leading=12,
+    )
 
     doc = SimpleDocTemplate(
         str(arquivo_saida_pdf),
@@ -479,17 +611,18 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
         TableStyle(
             [
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(bg_color)),
-                ("GRID", (0, 0), (-1, -1), 1.2, colors.HexColor("#0F172A")),
+                ("BOX", (0, 0), (-1, -1), 1.1, CYBER_DARK),
+                ("INNERGRID", (0, 0), (-1, -1), 0.6, CYBER_DARK),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 10),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-                ("TOPPADDING", (0, 0), (-1, -1), 8),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+                ("TOPPADDING", (0, 0), (-1, -1), 9),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
             ]
         )
     )
     elements.append(diag_table)
-    elements.append(Spacer(1, 14))
+    elements.append(Spacer(1, 18))
 
     risco_table = Table(
         [
@@ -502,8 +635,9 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
     risco_table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#E2E8F0")),
-                ("GRID", (0, 0), (-1, -1), 1, colors.HexColor("#94A3B8")),
+                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EAF8FF")),
+                ("BOX", (0, 0), (-1, -1), 1.0, CYBER_DARK),
+                ("INNERGRID", (0, 0), (-1, -1), 0.6, colors.HexColor("#94A3B8")),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 8),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 8),
@@ -514,7 +648,7 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
     )
     elements.append(Paragraph("Avaliação de Riscos por Severidade", cabecalho))
     elements.append(risco_table)
-    elements.append(Spacer(1, 10))
+    elements.append(Spacer(1, 14))
 
     if vetores:
         elements.append(Paragraph("Vetores de Risco Identificados", cabecalho))
@@ -524,30 +658,30 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
 
     elements.append(Paragraph("Proporção do Status das Ferramentas", cabecalho))
     elements.append(_build_pie_chart(resumo))
-    elements.append(Spacer(1, 14))
-
-    # Mantém diagnóstico, risco e gráfico exclusivamente na Página 2.
-    elements.append(PageBreak())
-
-    elements.append(Paragraph(f"Alvo: {resumo['email']}", styles["Normal"]))
-    elements.append(Paragraph(f"Gerado em: {resumo['gerado_em']}", styles["Normal"]))
-    elements.append(Paragraph(f"Status Geral: {resumo['status_geral'].upper()}", styles["Normal"]))
     elements.append(Spacer(1, 12))
 
-    tabela = Table(_montar_tabela_ferramentas(resumo), colWidths=[90, 70, 330])
+    elements.append(PageBreak())
+
+    elements.append(Paragraph(f"Alvo: {resumo['email']}", meta_style))
+    elements.append(Paragraph(f"Gerado em: {resumo['gerado_em']}", meta_style))
+    elements.append(Paragraph(f"Status Geral: {resumo['status_geral'].upper()}", accent_style))
+    elements.append(Spacer(1, 12))
+
+    tabela = Table(_montar_tabela_ferramentas(resumo), colWidths=[120, 90, 290], repeatRows=1)
     tabela.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0B192C")),
+                ("BACKGROUND", (0, 0), (-1, 0), CYBER_DARK),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("GRID", (0, 0), (-1, -1), 1, colors.HexColor("#94A3B8")),
+                ("GRID", (0, 0), (-1, -1), 0.8, colors.HexColor("#94A3B8")),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F8FAFC")]),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 6),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 7),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+                ("TOPPADDING", (0, 0), (-1, -1), 7),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
             ]
         )
     )
@@ -588,6 +722,7 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
         elements.extend(elementos_lista)
         elements.append(Spacer(1, 12))
 
+    elements.append(PageBreak())
     elements.append(Paragraph("Plano de Ação e Recomendações", cabecalho))
     elements.append(Paragraph("• Revisar credenciais expostas em serviços públicos e verificar contas ativas reportadas.", styles["BodyText"]))
     elements.append(Paragraph("• Validar autenticação do Google/GHunt e renovar cookies quando necessário.", styles["BodyText"]))

@@ -1,0 +1,7 @@
+workspace add sentinela
+workspaces load sentinela
+modules load recon/contacts-contacts
+modules load profiler/templates
+options set SOURCE usuario@provedor.com
+run
+exit

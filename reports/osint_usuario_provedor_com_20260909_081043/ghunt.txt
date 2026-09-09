@@ -1,0 +1,1 @@
+GHunt não pode ser executado porque o arquivo de cookies do Google não foi encontrado. Configure GHUNT_COOKIES_FILE ou deixe um arquivo cookies.json no diretório do projeto.

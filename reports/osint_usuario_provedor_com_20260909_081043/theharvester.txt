@@ -1,0 +1,1 @@
+Ferramenta não encontrada no PATH: [WinError 2] O sistema não pode encontrar o arquivo especificado

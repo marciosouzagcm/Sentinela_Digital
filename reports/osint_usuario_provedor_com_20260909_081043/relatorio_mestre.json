@@ -1,0 +1,81 @@
+{
+    "diretorio_scan": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043",
+    "email": "usuario@provedor.com",
+    "ferramentas": {
+        "emailharvester": {
+            "data": {
+                "api_keys": {},
+                "domain": "provedor.com",
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\emailharvester.txt",
+            "status": "unavailable"
+        },
+        "ghunt": {
+            "data": {
+                "cookies_file": null,
+                "warning": "GHunt não pode ser executado porque o arquivo de cookies do Google não foi encontrado. Configure GHUNT_COOKIES_FILE ou deixe um arquivo cookies.json no diretório do projeto."
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\ghunt.txt",
+            "status": "skipped"
+        },
+        "gitleaks": {
+            "data": {
+                "email": "usuario@provedor.com",
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\gitleaks.txt",
+            "status": "unavailable"
+        },
+        "h8mail": {
+            "data": {
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\h8mail.txt",
+            "status": "unavailable"
+        },
+        "holehe": {
+            "data": {
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado",
+                "rate_limit_delay": 0.25,
+                "timeout_seconds": 120
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\holehe.txt",
+            "status": "unavailable"
+        },
+        "maltego": {
+            "data": {
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\maltego.txt",
+            "status": "unavailable"
+        },
+        "recon_ng": {
+            "data": {
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado",
+                "resource_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\recon_ng_commands.rc"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\recon_ng.txt",
+            "status": "unavailable"
+        },
+        "sherlock": {
+            "data": {
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\sherlock.txt",
+            "status": "unavailable"
+        },
+        "theharvester": {
+            "data": {
+                "api_keys": {},
+                "domain": "provedor.com",
+                "error": "[WinError 2] O sistema não pode encontrar o arquivo especificado"
+            },
+            "output_file": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\theharvester.txt",
+            "status": "unavailable"
+        }
+    },
+    "gerado_em": "2026-09-09T08:10:43.726735+00:00",
+    "pdf": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\relatorio_executivo.pdf",
+    "relatorio_mestre": "C:\\Users\\DELL\\Sentinela_Digital\\reports\\osint_usuario_provedor_com_20260909_081043\\relatorio_mestre.json"
+}
