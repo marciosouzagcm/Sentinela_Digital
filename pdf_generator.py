@@ -62,7 +62,27 @@ def _coletar_linhas(raw: Any) -> list[str]:
 def _normalizar_status(status: Any) -> str:
     if not status:
         return "unknown"
-    return str(status).strip().lower()
+    normalizado = str(status).strip().lower().replace(" ", "_")
+    if normalizado in {"rate_limit", "rate_limited", "rate_limite"}:
+        return "rate_limit"
+    return normalizado
+
+
+def _nome_ferramenta(nome: str) -> str:
+    normalizado = re.sub(r"\s+", "", nome.strip().lower())
+    return "h8mail" if normalizado in {"hmail", "h8mail"} else nome.strip()
+
+
+def _resumo_por_status(nome: str, status: str, linhas: list[str]) -> str | None:
+    if status == "error":
+        return "Falha de execução / Dependência ausente"
+    if status == "rate_limit":
+        return "Bloqueio temporário por limite de requisições."
+    if status == "skipped":
+        return "Execução ignorada ou configuração pendente."
+    if status == "success" and nome.lower() in {"gitleaks", "h8mail"} and not linhas:
+        return "Varredura concluída. Nenhum vazamento detectado."
+    return None
 
 
 def _extrair_destaques_holehe(linhas: list[str]) -> list[str]:
@@ -100,6 +120,7 @@ def _extrair_destaques_sherlock(linhas: list[str]) -> list[str]:
 
 
 def _resumo_ferramenta(nome: str, detalhe: Any) -> dict[str, Any]:
+    nome = _nome_ferramenta(nome)
     status = _normalizar_status((detalhe or {}).get("status") if isinstance(detalhe, dict) else None)
     dados = (detalhe or {}).get("data", {}) if isinstance(detalhe, dict) else {}
     linhas = _coletar_linhas(dados.get("lines", []))
@@ -109,6 +130,15 @@ def _resumo_ferramenta(nome: str, detalhe: Any) -> dict[str, Any]:
                 linhas = _coletar_linhas(handle.read())
         except OSError:
             linhas = []
+
+    resumo_status = _resumo_por_status(nome, status, linhas)
+    if resumo_status is not None:
+        return {
+            "status": status,
+            "resumo": resumo_status,
+            "destaques": [] if status in {"error", "skipped", "rate_limit"} else linhas[:5],
+            "linhas": linhas[:10],
+        }
 
     if nome == "sherlock":
         linhas = [linha for linha in linhas if not re.search(r"@\w+\.\w+", linha) and not re.search(r"\buser@example\.com\b", linha, re.I)]
@@ -223,6 +253,7 @@ def _status_color(status: str) -> str:
         "warning": colors.HexColor("#F59E0B"),
         "filtered": colors.HexColor("#9CA3AF"),
         "skipped": colors.HexColor("#64748B"),
+        "rate_limit": colors.HexColor("#F97316"),
         "no_data": colors.HexColor("#6B7280"),
         "error": colors.HexColor("#D64545"),
         "timeout": colors.HexColor("#F97316"),
@@ -256,7 +287,7 @@ def _nivel_risco_geral(resumo: dict[str, Any]) -> tuple[str, list[str], int, int
         for linha in destaques:
             if "@" in linha or "password" in linha.lower() or "senha" in linha.lower():
                 credenciais_vazadas += 1
-        if status in {"error", "timeout", "unavailable", "auth_required"}:
+        if status in {"error", "timeout", "unavailable", "auth_required", "rate_limit"}:
             vetores.append(f"{nome}: falha de varredura ou autenticação incompleta.")
         elif status in {"success", "warning"} and destaques:
             vetores.append(f"{nome}: contas ou serviços relevantes foram localizados.")
@@ -274,15 +305,25 @@ def _nivel_risco_geral(resumo: dict[str, Any]) -> tuple[str, list[str], int, int
 def _montar_tabela_ferramentas(resumo: dict[str, Any]) -> list[list[str]]:
     linhas = [["Ferramenta", "Status", "Resumo"]]
     for nome, detalhe in resumo["ferramentas"].items():
-        linhas.append([nome, detalhe.get("status", "unknown").upper(), detalhe.get("resumo", "Sem resumo")[:90]])
+        status = detalhe.get("status", "unknown")
+        status_label = "RATE LIMIT" if status == "rate_limit" else status.upper()
+        linhas.append([_nome_ferramenta(str(nome)), status_label, detalhe.get("resumo", "Sem resumo")[:90]])
     return linhas
 
 
 def _montar_destaques(resumo: dict[str, Any]) -> list[str]:
     destaques: list[str] = []
     for nome, detalhe in resumo["ferramentas"].items():
-        for item in detalhe.get("destaques", []):
-            linha = f"{nome}: {item}"
+        nome_exibicao = _nome_ferramenta(str(nome))
+        status = detalhe.get("status", "unknown")
+        itens = detalhe.get("destaques", [])
+        if status == "error":
+            itens = ["Falha de execução / Dependência ausente"]
+        for item in itens:
+            item_texto = str(item)
+            if re.search(r"traceback \(most recent call last\)|^\s*file \".*\", line \d+|^[\w.]+(?:error|exception):", item_texto, re.IGNORECASE):
+                item_texto = "Falha de execução / Dependência ausente"
+            linha = f"{nome_exibicao}: {item_texto}"
             if linha not in destaques:
                 destaques.append(linha)
     return destaques[:12]
@@ -298,7 +339,7 @@ def _status_distribution(resumo: dict[str, Any]) -> list[int]:
             safe += 1
         elif status in {"warning"}:
             found += 1
-        elif status in {"error", "timeout", "unavailable", "auth_required"}:
+        elif status in {"error", "timeout", "unavailable", "auth_required", "rate_limit"}:
             failed += 1
         else:
             safe += 1
@@ -485,6 +526,9 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
     elements.append(_build_pie_chart(resumo))
     elements.append(Spacer(1, 14))
 
+    # Mantém diagnóstico, risco e gráfico exclusivamente na Página 2.
+    elements.append(PageBreak())
+
     elements.append(Paragraph(f"Alvo: {resumo['email']}", styles["Normal"]))
     elements.append(Paragraph(f"Gerado em: {resumo['gerado_em']}", styles["Normal"]))
     elements.append(Paragraph(f"Status Geral: {resumo['status_geral'].upper()}", styles["Normal"]))
@@ -514,6 +558,7 @@ def _montar_pdf(dados: dict[str, Any], arquivo_saida_pdf: str | Path) -> None:
             "warning": colors.HexColor("#FEF3C7"),
             "filtered": colors.HexColor("#E5E7EB"),
             "skipped": colors.HexColor("#E2E8F0"),
+            "rate_limit": colors.HexColor("#FFEDD5"),
             "no_data": colors.HexColor("#E5E7EB"),
             "error": colors.HexColor("#FEE2E2"),
             "timeout": colors.HexColor("#FFEDD5"),
