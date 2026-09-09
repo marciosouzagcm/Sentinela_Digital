@@ -3,6 +3,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 import time
 import threading
@@ -22,6 +23,7 @@ from modules.osint.mod_maltego import run_maltego
 from modules.osint.mod_recon_ng import run_recon_ng
 from modules.osint.mod_sherlock import run_sherlock
 from modules.osint.mod_theharvester import run_theharvester
+from pdf_generator import gerar_pdf
 from modulos.utilidades import Vulnerabilidade
 from modulos.coleta import coletar_informacoes
 from modulos.escaneamento import escanear
@@ -72,6 +74,21 @@ def _sanitizar_email(email: str) -> str:
     return "".join(char if char.isalnum() or char in "-_" else "_" for char in sanitizado)
 
 
+ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+
+
+def _sanitizar_json(value: Any) -> Any:
+    if isinstance(value, str):
+        return ANSI_ESCAPE_RE.sub("", value)
+    if isinstance(value, dict):
+        return {str(chave): _sanitizar_json(item) for chave, item in value.items()}
+    if isinstance(value, list):
+        return [_sanitizar_json(item) for item in value]
+    if isinstance(value, tuple):
+        return [_sanitizar_json(item) for item in value]
+    return value
+
+
 def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[str, Any]:
     """Executa os adaptadores OSINT, isolando falhas por ferramenta."""
     if "@" not in email or email.startswith("@") or email.endswith("@"):
@@ -108,8 +125,20 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
             relatorio_mestre["ferramentas"][nome] = {"status": "error", "output_file": None, "data": {"error": str(exc)}}
 
     caminho_mestre = output_dir / "relatorio_mestre.json"
+    caminho_pdf = output_dir / "relatorio_executivo.pdf"
     relatorio_mestre["relatorio_mestre"] = str(caminho_mestre)
-    caminho_mestre.write_text(json.dumps(relatorio_mestre, indent=4, ensure_ascii=False), encoding="utf-8")
+    relatorio_mestre["pdf"] = str(caminho_pdf)
+    payload_limpo = _sanitizar_json(relatorio_mestre)
+    caminho_mestre.write_text(json.dumps(payload_limpo, indent=4, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+
+    try:
+        gerado = gerar_pdf(caminho_mestre, caminho_pdf)
+        relatorio_mestre["pdf"] = gerado
+        logger.info("PDF gerado automaticamente: %s", gerado)
+    except Exception as exc:
+        logger.exception("Falha ao gerar PDF automático para %s", caminho_mestre)
+        relatorio_mestre["pdf_error"] = str(exc)
+
     logger.info("Pipeline OSINT concluído: %s", caminho_mestre)
     return relatorio_mestre
 

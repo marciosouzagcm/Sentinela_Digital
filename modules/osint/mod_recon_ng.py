@@ -1,7 +1,14 @@
 """Adaptador independente para o recon-ng."""
-from pathlib import Path
+import re
 import subprocess
+from pathlib import Path
 from typing import Any
+
+ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+
+
+def _limpar_saida(raw_output: str) -> str:
+    return ANSI_ESCAPE_RE.sub("", raw_output or "").strip()
 
 
 def run_recon_ng(email: str, output_dir: Path) -> dict[str, Any]:
@@ -9,7 +16,18 @@ def run_recon_ng(email: str, output_dir: Path) -> dict[str, Any]:
     output_file = output_dir / "recon_ng.txt"
     resource_file = output_dir / "recon_ng_commands.rc"
     resource_file.write_text(
-        f"search contacts {email}\nexit\n",
+        "\n".join(
+            [
+                "workspace add sentinela",
+                "workspaces load sentinela",
+                "modules load recon/contacts-contacts",
+                "modules load profiler/templates",
+                f"options set SOURCE {email}",
+                "run",
+                "exit",
+                "",
+            ]
+        ),
         encoding="utf-8",
     )
     command = ["recon-ng", "-r", str(resource_file)]
@@ -23,14 +41,18 @@ def run_recon_ng(email: str, output_dir: Path) -> dict[str, Any]:
             timeout=120,
             check=False,
         )
-        raw_output = result.stdout + (("\n[stderr]\n" + result.stderr) if result.stderr else "")
+        raw_output = _limpar_saida(result.stdout + (("\n[stderr]\n" + result.stderr) if result.stderr else ""))
         status = "success" if result.returncode == 0 else "error"
-        data = {"returncode": result.returncode, "resource_file": str(resource_file), "lines": [line.strip() for line in result.stdout.splitlines() if line.strip()]}
+        data = {
+            "returncode": result.returncode,
+            "resource_file": str(resource_file),
+            "lines": [line.strip() for line in raw_output.splitlines() if line.strip()],
+        }
     except FileNotFoundError as exc:
         raw_output, status, data = f"Ferramenta não encontrada no PATH: {exc}", "unavailable", {"error": str(exc), "resource_file": str(resource_file)}
     except subprocess.TimeoutExpired as exc:
         raw_output, status, data = f"Execução excedeu o timeout de 120 segundos: {exc}", "timeout", {"error": str(exc), "resource_file": str(resource_file)}
     except OSError as exc:
         raw_output, status, data = f"Falha ao iniciar ferramenta: {exc}", "error", {"error": str(exc), "resource_file": str(resource_file)}
-    output_file.write_text(raw_output, encoding="utf-8")
+    output_file.write_text(_limpar_saida(raw_output), encoding="utf-8")
     return {"status": status, "output_file": str(output_file), "data": data}
