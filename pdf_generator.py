@@ -730,9 +730,89 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
 
 
 # --------------------------------------------------------------------------- #
+# Indicadores de exposição para integrações legadas
+# --------------------------------------------------------------------------- #
+def _calcular_score_exposicao(report: Dict[str, Any]) -> int:
+    """Calcula um score simples somente a partir de evidências confirmadas."""
+    tools: Dict[str, Any] = report.get("ferramentas") or {}
+    score = 0
+
+    holehe_tool = tools.get("holehe", {}) or {}
+    holehe_lines = _lines(holehe_tool)
+    holehe_lines.extend(str(item) for item in holehe_tool.get("destaques") or [])
+    holehe_hits = sorted({
+        match.group(1).strip().rstrip(",;")
+        for line in holehe_lines
+        for match in [re.match(r"^\s*\[\+\]\s*(\S+)", line)]
+        if match and "." in match.group(1) and match.group(1).lower() not in {"email", "used"}
+    })
+    score += min(len(holehe_hits), 10) * 10
+
+    h8mail = tools.get("h8mail", {}) or {}
+    h8_lines = " ".join(_lines(h8mail) + [str(item) for item in h8mail.get("destaques") or []]).lower()
+    if re.search(r"compromised|breach", h8_lines) and not re.search(
+        r"not compromised|no breach", h8_lines
+    ):
+        score += 40
+
+    for name in ("gitleaks", "sherlock"):
+        tool = tools.get(name, {}) or {}
+        evidence = " ".join(_lines(tool)).lower()
+        highlights = " ".join(str(item) for item in tool.get("destaques") or []).lower()
+        combined = f"{evidence} {highlights}"
+        if name == "gitleaks" and re.search(r"leak|secret|password|token", combined):
+            if "no leak" not in combined and "nenhum vazamento" not in combined:
+                score += 50
+        if name == "sherlock" and parse_sherlock(tool, report.get("email", ""))[0]:
+            score += 20
+
+    return min(score, 100)
+
+
+def _nivel_risco_geral(report: Dict[str, Any]) -> Tuple[str, List[str], int, int]:
+    """Retorna nível, vetores confirmados, contas ativas e score."""
+    tools: Dict[str, Any] = report.get("ferramentas") or {}
+    score = _calcular_score_exposicao(report)
+    holehe_tool = tools.get("holehe", {}) or {}
+    holehe_evidence = _lines(holehe_tool) + [
+        str(item) for item in holehe_tool.get("destaques") or []
+    ]
+    holehe_positive = [line for line in holehe_evidence if re.match(r"^\s*\[\+\]", line)]
+    h8mail = tools.get("h8mail", {}) or {}
+    h8_evidence = " ".join(
+        _lines(h8mail) + [str(item) for item in h8mail.get("destaques") or []]
+    ).lower()
+    h8_confirmed = bool(re.search(r"compromised|breach", h8_evidence)) and not bool(
+        re.search(r"not compromised|no breach", h8_evidence)
+    )
+    contas_ativas = len(holehe_positive) + (1 if h8_confirmed else 0)
+    vetores: List[str] = []
+
+    if contas_ativas:
+        vetores.append(f"Holehe: {contas_ativas} conta(s) ativa(s) confirmada(s)")
+    if h8_confirmed:
+        vetores.append("H8mail: indício de comprometimento")
+    sherlock_hits, _ = parse_sherlock(tools.get("sherlock", {}), report.get("email", ""))
+    if sherlock_hits:
+        vetores.append(f"Sherlock: {len(sherlock_hits)} perfil(is) confirmado(s)")
+
+    if score >= 70:
+        nivel = "CRÍTICO"
+    elif score >= 30:
+        nivel = "ALTO"
+    elif score > 0:
+        nivel = "MÉDIO"
+    else:
+        nivel = "BAIXO"
+    return nivel, vetores, contas_ativas, score
+
+
+# --------------------------------------------------------------------------- #
 # Entrypoint Principal
 # --------------------------------------------------------------------------- #
-def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe de Segurança", watermark: Optional[str] = None) -> None:
+def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe de Segurança", watermark: Optional[str] = None) -> str:
+    json_path = str(json_path)
+    output_pdf_path = str(output_pdf_path)
     _register_unicode_fonts()
     
     with open(json_path, "r", encoding="utf-8") as f:
@@ -766,6 +846,10 @@ def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe d
 
     doc.build(story, canvasmaker=canvas_maker)
     print(f"PDF executivo gerado com sucesso: {output_pdf_path}")
+    return output_pdf_path
+
+
+gerar_pdf = generate_pdf
 
 
 if __name__ == "__main__":
