@@ -19,6 +19,7 @@ import json
 import os
 import re
 import sys
+from xml.sax.saxutils import escape
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -154,17 +155,45 @@ def _fmt_datetime(value: Optional[str]) -> str:
     return parsed.strftime("%d/%m/%Y %H:%M:%S UTC")
 
 
-def parse_holehe(tool: Dict[str, Any]) -> List[str]:
-    found = []
-    for line in _lines(tool):
-        match = re.match(r"^\s*\[\+\]\s*(\S+)", line)
+def parse_holehe(tool: Dict[str, Any]) -> Dict[str, List[str]]:
+    result = {"confirmed": [], "rate_limited": [], "negative": []}
+    lines = _lines(tool) + [str(item) for item in tool.get("destaques") or []]
+    for line in lines:
+        match = re.match(r"^\s*\[([+x-])\]\s*(\S+)", line, re.IGNORECASE)
         if not match:
             continue
-        token = match.group(1).strip().rstrip(",;")
-        if "." not in token or token.lower() in {"email", "used"}:
+        marker, token = match.group(1).lower(), match.group(2).strip().rstrip(",;")
+        if token.lower() in {"email", "used"}:
             continue
-        found.append(token)
-    return sorted(set(found))
+        category = {"+": "confirmed", "x": "rate_limited", "-": "negative"}[marker]
+        result[category].append(token)
+    return {key: sorted(set(values)) for key, values in result.items()}
+
+
+def parse_ghunt(tool: Dict[str, Any]) -> Dict[str, Any]:
+    """Extrai sinais de exposição pública da saída textual do GHunt."""
+    lines = _lines(tool)
+    text = "\n".join(lines).lower()
+    services = []
+    for service in ("youtube", "photos", "maps", "meet", "calendar", "play games"):
+        if service in text and ("activated" in text or "services" in text or "data" in text):
+            services.append(service)
+    calendar_public = "public google calendar found" in text
+    event_match = re.search(r"(\d+)\s+events? dumped", text)
+    return {
+        "authenticated": "authenticated" in text,
+        "calendar_public": calendar_public,
+        "event_count": int(event_match.group(1)) if event_match else 0,
+        "services": sorted(set(services)),
+    }
+
+
+def _confirmed_tool(tool: Dict[str, Any]) -> bool:
+    return str((tool or {}).get("status", "")).lower() == "success"
+
+
+def _paragraph_text(value: Any) -> str:
+    return escape(clean_raw_message(str(value)))
 
 
 def parse_sherlock(tool: Dict[str, Any], email: str) -> Tuple[List[Tuple[str, str]], int]:
@@ -324,7 +353,8 @@ def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "mitigacao": rule["mitigacao"],
             })
 
-    holehe_hits = parse_holehe(tools.get("holehe", {}))
+    holehe_data = parse_holehe(tools.get("holehe", {}))
+    holehe_hits = [item for item in holehe_data["confirmed"] if "." in item]
     if holehe_hits:
         findings.append({
             "origem": "holehe",
@@ -335,6 +365,17 @@ def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
             "probabilidade": "Alta",
             "riscos": "Riscos de engenharia social direcionada e reset de conta.",
             "mitigacao": "Ativar MFA em todos os serviços e gerenciar senhas salvas.",
+        })
+    if holehe_data["rate_limited"]:
+        findings.append({
+            "origem": "holehe",
+            "titulo": "Cobertura parcial por limite de taxa",
+            "evidencia": ", ".join(holehe_data["rate_limited"][:10]),
+            "impacto": "Alguns serviços não puderam ser classificados com confiança.",
+            "severidade": "INFORMATIVO",
+            "probabilidade": "Alta",
+            "riscos": "Possível falso negativo de presença de conta.",
+            "mitigacao": "Reexecutar com intervalo maior e respeitar os limites do provedor.",
         })
 
     if "h8mail" in tools:
@@ -363,6 +404,21 @@ def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
             "riscos": "Desperdício de tempo em análises de perfis inexistentes.",
             "mitigacao": "Ajustar regex de verificação para o nome de usuário isolado.",
         })
+
+    ghunt = tools.get("ghunt", {}) or {}
+    if _confirmed_tool(ghunt):
+        ghunt_data = parse_ghunt(ghunt)
+        if ghunt_data["calendar_public"]:
+            findings.append({
+                "origem": "ghunt",
+                "titulo": "Calendário Google público identificado",
+                "evidencia": f"{ghunt_data['event_count']} evento(s) reportado(s) como públicos.",
+                "impacto": "Metadados de agenda podem revelar rotina, localização e vínculos.",
+                "severidade": "MÉDIO",
+                "probabilidade": "Alta",
+                "riscos": "Exposição de rotina e uso em engenharia social direcionada.",
+                "mitigacao": "Revisar compartilhamento do calendário e remover eventos públicos desnecessários.",
+            })
 
     # Deduplicação
     merged: Dict[Tuple[str, str], Dict[str, Any]] = {}
@@ -520,7 +576,7 @@ def section(title: str, styles: Dict[str, ParagraphStyle]) -> Paragraph:
 
 
 def kv_table(rows: Iterable[Tuple[str, str]], styles: Dict[str, ParagraphStyle], width: float) -> Table:
-    data = [[Paragraph(f"<b>{k}</b>", styles["small"]), Paragraph(v, styles["small"])] for k, v in rows]
+    data = [[Paragraph(f"<b>{escape(str(k))}</b>", styles["small"]), Paragraph(_paragraph_text(v), styles["small"])] for k, v in rows]
     table = Table(data, colWidths=[0.30 * width, 0.70 * width], hAlign="LEFT")
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (0, -1), ZEBRA),
@@ -542,7 +598,7 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
     email = report.get("email") or "n/d"
     tools: Dict[str, Any] = report.get("ferramentas") or {}
     findings = build_findings(report)
-    holehe_hits = parse_holehe(tools.get("holehe", {}))
+    holehe_hits = [item for item in parse_holehe(tools.get("holehe", {}))["confirmed"] if "." in item]
     _, sherlock_discarded = parse_sherlock(tools.get("sherlock", {}), email)
     h8_verdict, _ = parse_h8mail(tools.get("h8mail", {})) if "h8mail" in tools else ("n/d", [])
 
@@ -594,8 +650,8 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
 
     story.append(Spacer(1, 4))
     story.append(Paragraph(
-        f"A varredura consultou {len(tools)} scanners OSINT contra o alvo <b>{email}</b>. "
-        f"Verificação de vazamentos: <b>{h8_verdict}</b>. Consolidados <b>{len(findings)} achados</b>. "
+        f"A varredura consultou {len(tools)} scanners OSINT contra o alvo <b>{escape(str(email))}</b>. "
+        f"Verificação de vazamentos: <b>{escape(str(h8_verdict))}</b>. Consolidados <b>{len(findings)} achados</b>. "
         f"Resultados genéricos descartados como falso positivo: {sherlock_discarded}.", styles["body"]
     ))
 
@@ -621,10 +677,10 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
         note = (parse_failures(name, tool) or [fallback])[0]
         
         data.append([
-            Paragraph(name, styles["small"]),
+            Paragraph(_paragraph_text(name), styles["small"]),
             Paragraph(f"<b>{label}</b>", styles["small_center"]),
             Paragraph("—" if returncode is None else str(returncode), styles["small"]),
-            Paragraph(note[:180] + ("..." if len(note) > 180 else ""), styles["smallmuted"]),
+            Paragraph(_paragraph_text(note[:180] + ("..." if len(note) > 180 else "")), styles["smallmuted"]),
         ])
         cmds.append(("BACKGROUND", (1, row_index), (1, row_index), color))
         if row_index % 2 == 0:
@@ -644,7 +700,7 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
         for index in range(0, len(holehe_hits), columns):
             chunk = holehe_hits[index:index + columns]
             chunk += [""] * (columns - len(chunk))
-            rows.append([Paragraph(item, styles["small"]) for item in chunk])
+            rows.append([Paragraph(_paragraph_text(item), styles["small"]) for item in chunk])
         hits = Table(rows, colWidths=[width / columns] * columns)
         hits.setStyle(TableStyle([
             ("GRID", (0, 0), (-1, -1), 0.3, LINE),
@@ -682,19 +738,19 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
         sev = finding["severidade"]
         sev_color = SEVERITY_COLORS.get(sev, BLUE)
         
-        origem_box = f"<b>{finding['titulo']}</b><br/><font color='{MUTED.hexval()}'>{finding['origem']}</font>"
+        origem_box = f"<b>{escape(str(finding['titulo']))}</b><br/><font color='{MUTED.hexval()}'>{escape(str(finding['origem']))}</font>"
         if finding["evidencia"]:
-            origem_box += f"<br/><font color='{MUTED.hexval()}'><i>{finding['evidencia'][:120]}</i></font>"
+            origem_box += f"<br/><font color='{MUTED.hexval()}'><i>{_paragraph_text(finding['evidencia'][:120])}</i></font>"
 
-        impacto_box = f"{finding['impacto']}<br/><b>Riscos:</b> {finding['riscos']}"
+        impacto_box = f"{_paragraph_text(finding['impacto'])}<br/><b>Riscos:</b> {_paragraph_text(finding['riscos'])}"
 
         f_data.append([
             Paragraph(str(idx), styles["small"]),
             Paragraph(origem_box, styles["small"]),
             Paragraph(f"<b>{sev}</b>", styles["small_center"]),
-            Paragraph(finding["probabilidade"], styles["small"]),
+            Paragraph(_paragraph_text(finding["probabilidade"]), styles["small"]),
             Paragraph(impacto_box, styles["small"]),
-            Paragraph(finding["mitigacao"], styles["small"]),
+            Paragraph(_paragraph_text(finding["mitigacao"]), styles["small"]),
         ])
         
         f_cmds.append(("BACKGROUND", (2, idx), (2, idx), sev_color))
@@ -738,6 +794,8 @@ def _calcular_score_exposicao(report: Dict[str, Any]) -> int:
     score = 0
 
     holehe_tool = tools.get("holehe", {}) or {}
+    if not _confirmed_tool(holehe_tool):
+        holehe_tool = {}
     holehe_lines = _lines(holehe_tool)
     holehe_lines.extend(str(item) for item in holehe_tool.get("destaques") or [])
     holehe_hits = sorted({
@@ -750,13 +808,15 @@ def _calcular_score_exposicao(report: Dict[str, Any]) -> int:
 
     h8mail = tools.get("h8mail", {}) or {}
     h8_lines = " ".join(_lines(h8mail) + [str(item) for item in h8mail.get("destaques") or []]).lower()
-    if re.search(r"compromised|breach", h8_lines) and not re.search(
+    if _confirmed_tool(h8mail) and re.search(r"compromised|breach", h8_lines) and not re.search(
         r"not compromised|no breach", h8_lines
     ):
         score += 40
 
     for name in ("gitleaks", "sherlock"):
         tool = tools.get(name, {}) or {}
+        if not _confirmed_tool(tool):
+            continue
         evidence = " ".join(_lines(tool)).lower()
         highlights = " ".join(str(item) for item in tool.get("destaques") or []).lower()
         combined = f"{evidence} {highlights}"
@@ -764,6 +824,12 @@ def _calcular_score_exposicao(report: Dict[str, Any]) -> int:
             if "no leak" not in combined and "nenhum vazamento" not in combined:
                 score += 50
         if name == "sherlock" and parse_sherlock(tool, report.get("email", ""))[0]:
+            score += 20
+
+    ghunt = tools.get("ghunt", {}) or {}
+    if _confirmed_tool(ghunt):
+        ghunt_data = parse_ghunt(ghunt)
+        if ghunt_data["calendar_public"]:
             score += 20
 
     return min(score, 100)
@@ -774,15 +840,17 @@ def _nivel_risco_geral(report: Dict[str, Any]) -> Tuple[str, List[str], int, int
     tools: Dict[str, Any] = report.get("ferramentas") or {}
     score = _calcular_score_exposicao(report)
     holehe_tool = tools.get("holehe", {}) or {}
+    if not _confirmed_tool(holehe_tool):
+        holehe_tool = {}
     holehe_evidence = _lines(holehe_tool) + [
         str(item) for item in holehe_tool.get("destaques") or []
     ]
-    holehe_positive = [line for line in holehe_evidence if re.match(r"^\s*\[\+\]", line)]
+    holehe_positive = parse_holehe(holehe_tool)["confirmed"]
     h8mail = tools.get("h8mail", {}) or {}
     h8_evidence = " ".join(
         _lines(h8mail) + [str(item) for item in h8mail.get("destaques") or []]
     ).lower()
-    h8_confirmed = bool(re.search(r"compromised|breach", h8_evidence)) and not bool(
+    h8_confirmed = _confirmed_tool(h8mail) and bool(re.search(r"compromised|breach", h8_evidence)) and not bool(
         re.search(r"not compromised|no breach", h8_evidence)
     )
     contas_ativas = len(holehe_positive) + (1 if h8_confirmed else 0)
@@ -795,6 +863,9 @@ def _nivel_risco_geral(report: Dict[str, Any]) -> Tuple[str, List[str], int, int
     sherlock_hits, _ = parse_sherlock(tools.get("sherlock", {}), report.get("email", ""))
     if sherlock_hits:
         vetores.append(f"Sherlock: {len(sherlock_hits)} perfil(is) confirmado(s)")
+    ghunt = tools.get("ghunt", {}) or {}
+    if _confirmed_tool(ghunt) and parse_ghunt(ghunt)["calendar_public"]:
+        vetores.append("GHunt: calendário Google público")
 
     if score >= 70:
         nivel = "CRÍTICO"

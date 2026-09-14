@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
 import logging
 import os
 import re
+import shutil
 import sys
 import time
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, List
@@ -89,14 +92,74 @@ def _sanitizar_json(value: Any) -> Any:
     return value
 
 
+_SECRET_PATTERNS = (
+    (re.compile(r"(?i)(password|passwd|senha|token|secret|api[_ -]?key)\s*[:=]\s*([^\s,;]+)"), r"\1: [REDACTED]"),
+    (re.compile(r"(?i)(gaia\s*id)\s*:\s*([0-9]{8,})"), r"\1: [REDACTED]"),
+    (re.compile(r"https?://calendar\.google\.com/calendar/ical/[^\s]+"), "[CALENDAR_URL_REDACTED]"),
+)
+
+
+def redact_sensitive(value: Any) -> Any:
+    """Mascara segredos e identificadores sensíveis antes da persistência."""
+    if isinstance(value, str):
+        for pattern, replacement in _SECRET_PATTERNS:
+            value = pattern.sub(replacement, value)
+        return value
+    if isinstance(value, dict):
+        return {str(key): redact_sensitive(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [redact_sensitive(item) for item in value]
+    if isinstance(value, tuple):
+        return [redact_sensitive(item) for item in value]
+    return value
+
+
+PRECHECK_BINARIES = {
+    "holehe": "holehe",
+    "h8mail": "h8mail",
+    "recon_ng": "recon-ng",
+    "theharvester": "theHarvester",
+    "emailharvester": "emailharvester",
+    "sherlock": "sherlock",
+    "maltego": "maltego",
+    "gitleaks": "gitleaks",
+    "ghunt": "ghunt",
+}
+
+
+def _resultado_indisponivel(nome: str, output_dir: Path) -> dict[str, Any]:
+    binary = PRECHECK_BINARIES[nome]
+    return {
+        "status": "unavailable",
+        "output_file": None,
+        "data": {"reason": f"Executável '{binary}' não encontrado no PATH.", "binary": binary},
+    }
+
+
+def _executar_ferramenta(nome: str, funcao: Callable[[str, Path], dict[str, Any]], email: str, output_dir: Path) -> tuple[str, dict[str, Any]]:
+    inicio = time.perf_counter()
+    if shutil.which(PRECHECK_BINARIES[nome]) is None:
+        resultado = _resultado_indisponivel(nome, output_dir)
+    else:
+        try:
+            logger.info("Iniciando ferramenta OSINT: %s", nome)
+            resultado = funcao(email, output_dir)
+        except Exception as exc:
+            logger.exception("Falha isolada no adaptador %s", nome)
+            resultado = {"status": "error", "output_file": None, "data": {"error": str(exc)}}
+    resultado.setdefault("data", {})["duration_ms"] = round((time.perf_counter() - inicio) * 1000, 2)
+    return nome, resultado
+
+
 def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[str, Any]:
     """Executa os adaptadores OSINT, isolando falhas por ferramenta."""
     if "@" not in email or email.startswith("@") or email.endswith("@"):
         raise ValueError("Informe um endereço de e-mail válido.")
 
     raiz_relatorios = base_dir or Path(__file__).resolve().parent / "reports"
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    output_dir = raiz_relatorios / f"osint_{_sanitizar_email(email)}_{timestamp}"
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+    pipeline_hash = hashlib.sha256(f"{email}:{timestamp}".encode("utf-8")).hexdigest()[:8]
+    output_dir = raiz_relatorios / f"osint_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
     output_dir.mkdir(parents=True, exist_ok=True)
     ferramentas: list[tuple[str, Callable[[str, Path], dict[str, Any]]]] = [
         ("holehe", run_holehe),
@@ -110,25 +173,35 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
         ("ghunt", run_ghunt),
     ]
     relatorio_mestre: dict[str, Any] = {
+        "schema_version": "1.1",
+        "tool_version": os.getenv("SENTINELA_TOOL_VERSION", "dev"),
+        "pipeline_id": pipeline_hash,
         "email": email,
         "gerado_em": datetime.now(timezone.utc).isoformat(),
         "diretorio_scan": str(output_dir),
         "ferramentas": {},
     }
     logger.warning("OSINT autorizado: use o pipeline somente em ativos e identidades com autorização explícita.")
-    for nome, funcao in ferramentas:
-        logger.info("Iniciando ferramenta OSINT: %s", nome)
-        try:
-            relatorio_mestre["ferramentas"][nome] = funcao(email, output_dir)
-        except Exception as exc:
-            logger.exception("Falha isolada no adaptador %s", nome)
-            relatorio_mestre["ferramentas"][nome] = {"status": "error", "output_file": None, "data": {"error": str(exc)}}
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="osint") as executor:
+        futures = [executor.submit(_executar_ferramenta, nome, funcao, email, output_dir) for nome, funcao in ferramentas]
+        for future in as_completed(futures):
+            nome, resultado = future.result()
+            relatorio_mestre["ferramentas"][nome] = resultado
 
-    caminho_mestre = output_dir / "relatorio_mestre.json"
-    caminho_pdf = output_dir / "relatorio_executivo.pdf"
+    caminho_mestre = output_dir / f"relatorio_mestre_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}.json"
+    caminho_pdf = output_dir / f"relatorio_executivo_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}.pdf"
+    status_counts: dict[str, int] = {}
+    for ferramenta in relatorio_mestre["ferramentas"].values():
+        status = str(ferramenta.get("status", "unknown"))
+        status_counts[status] = status_counts.get(status, 0) + 1
+    relatorio_mestre["coverage_summary"] = {
+        "total_tools": len(ferramentas),
+        "status_counts": status_counts,
+        "successful_tools": status_counts.get("success", 0),
+    }
     relatorio_mestre["relatorio_mestre"] = str(caminho_mestre)
     relatorio_mestre["pdf"] = str(caminho_pdf)
-    payload_limpo = _sanitizar_json(relatorio_mestre)
+    payload_limpo = redact_sensitive(_sanitizar_json(relatorio_mestre))
     caminho_mestre.write_text(json.dumps(payload_limpo, indent=4, ensure_ascii=False, sort_keys=True), encoding="utf-8")
 
     try:
