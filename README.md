@@ -33,13 +33,11 @@ Cada adaptador usa `subprocess.run` sem `shell=True`, captura `stdout` e `stderr
 ```text
 Sentinela_Digital/
 ├── main.py                 # CLI dupla e aplicação FastAPI
-├── api.py                  # Entrada alternativa para o servidor API
 ├── modulos/                # Fluxo web/infraestrutura existente
 ├── modules/osint/          # Adaptadores OSINT independentes
-├── reports/                # Relatórios gerados pela CLI OSINT
-├── relatorios/             # Relatórios do fluxo web
-├── public/relatorios/      # Último relatório consumido pelo frontend
-├── sentinela-dashboard/    # Dashboard React/Vite
+├── reports/                # JSON mestre, PDF e evidências de todas as buscas
+├── public/relatorios/      # Compatibilidade do dashboard legado
+├── src/                    # Dashboard React/Vite principal
 └── tests/                  # Testes automatizados
 ```
 
@@ -67,15 +65,15 @@ npm install
 
 ## Uso da CLI
 
-Os modos são mutuamente exclusivos: o programa exige exatamente `--alvo` ou `--email`.
+Os modos são mutuamente exclusivos: o programa exige exatamente `--email` ou um alvo web (`--alvo`, `--url` ou `--target`).
 
 ### Auditoria web/infraestrutura
 
 ```bash
-python main.py --alvo https://seusite-autorizado.com
-python main.py --alvo https://seusite-autorizado.com --codigo ./src
+python main.py --url https://seusite-autorizado.com
+python main.py --target https://seusite-autorizado.com --codigo ./src
 python main.py --alvo https://seusite-autorizado.com --continuo 30
-python main.py --alvo https://seusite-autorizado.com --sniffer
+python main.py --url https://seusite-autorizado.com --sniffer
 ```
 
 ### Pipeline OSINT
@@ -84,20 +82,15 @@ python main.py --alvo https://seusite-autorizado.com --sniffer
 python main.py --email pessoa@example.com
 ```
 
-O comando cria uma pasta como:
+Cada execução gera o mesmo ciclo de entrega para e-mail e web:
 
 ```text
-reports/osint_pessoa_example_com_20260907_120000/
-├── holehe.txt
-├── h8mail.txt
-├── recon_ng.txt
-├── theharvester.txt
-├── emailharvester.txt
-├── sherlock.txt
-├── maltego.txt
-├── gitleaks.txt
-├── ghunt.txt
-└── relatorio_mestre.json
+reports/
+├── evidencias_pessoa_example_com_<timestamp>_<hash>/
+│   ├── holehe.txt
+│   └── ...
+├── relatorio_mestre_pessoa_example_com_<timestamp>_<hash>.json
+└── relatorio_mestre_pessoa_example_com_<timestamp>_<hash>.pdf
 ```
 
 O e-mail é sanitizado no nome do caminho, substituindo `@`, `.`, espaços e caracteres especiais. O relatório mestre é gravado com `indent=4` e `ensure_ascii=False`.
@@ -159,8 +152,9 @@ O backend permanece publicado separadamente no Render.
 
 ## Relatórios e persistência
 
-- O fluxo web grava relatórios históricos em `relatorios/` e uma cópia em `public/relatorios/ultimo_relatorio.json`.
-- O fluxo OSINT grava um diretório exclusivo por e-mail e timestamp em `reports/`.
+- Ambos os fluxos gravam o JSON mestre, o PDF executivo e as evidências em `reports/`.
+- O basename é compartilhado pelos artefatos: `relatorio_mestre_<alvo>_<timestamp>_<hash_curto>`.
+- O fluxo web inclui coleta DNS/HTTP, port scan, headers e recursos sensíveis como ferramentas do relatório mestre.
 - Ferramentas ausentes aparecem com status `unavailable`; o pipeline ainda gera o relatório mestre.
 - Em ambientes efêmeros de hospedagem, arquivos locais podem ser perdidos após reinicialização ou novo deploy. Use armazenamento externo quando a retenção permanente for necessária.
 

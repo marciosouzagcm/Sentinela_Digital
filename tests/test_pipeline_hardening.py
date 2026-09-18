@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from main import _executar_ferramenta, redact_sensitive
+from main import _executar_ferramenta, executar_pipeline_web, redact_sensitive
+from modulos.utilidades import Vulnerabilidade
 from pdf_generator import _calcular_score_exposicao, parse_ghunt, parse_holehe
 
 
@@ -72,3 +73,25 @@ def test_precheck_marks_missing_binary_without_calling_adapter(tmp_path, monkeyp
     assert result["status"] == "unavailable"
     assert called is False
     assert result["data"]["duration_ms"] >= 0
+
+
+def test_web_pipeline_writes_master_json_and_pdf_to_reports(tmp_path, monkeypatch):
+    monkeypatch.setattr("main.coletar_informacoes", lambda alvo: {"alvo_original": alvo, "host": "example.com"})
+    monkeypatch.setattr("main.escanear", lambda host: [Vulnerabilidade(
+        identificador="A05-TEST", categoria="A05", titulo="Header ausente",
+        descricao="Header de segurança ausente.", ativo="https://example.com",
+        severidade="MEDIA", evidencia="Headers: []", mitigacao="Adicionar o header.",
+    )])
+    monkeypatch.setattr("main.pentest_web", lambda alvo: [])
+
+    resultado = executar_pipeline_web("https://example.com", base_dir=tmp_path)
+
+    mestre = Path(resultado["relatorio_mestre"])
+    pdf = Path(resultado["pdf"])
+    assert mestre.parent == tmp_path
+    assert mestre.name.startswith("relatorio_mestre_example.com_")
+    assert mestre.suffix == ".json"
+    assert pdf.name.removesuffix(".pdf") == mestre.name.removesuffix(".json")
+    assert mestre.exists()
+    assert pdf.exists()
+    assert pdf.stat().st_size > 0

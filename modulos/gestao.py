@@ -30,9 +30,9 @@ def _obter_configuracao_tidb() -> Dict[str, object]:
     return {
         "host": parsed.hostname,
         "port": parsed.port or 4000,
-        "user": parsed.username or os.getenv("TIDB_USER", "root"),
-        "password": parsed.password or os.getenv("TIDB_PASSWORD", ""),
-        "database": parsed.path.lstrip("/") or os.getenv("TIDB_DATABASE", "sentinela"),
+        "user": os.getenv("TIDB_USER") or parsed.username or "root",
+        "password": os.getenv("TIDB_PASSWORD") or parsed.password or "",
+        "database": os.getenv("TIDB_DATABASE") or parsed.path.lstrip("/") or "sentinela",
     }
 
 def _carregar_modulo_tidb():
@@ -154,6 +154,6 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
                 f.write(f"  Mitigação: {v.mitigacao}\n\n")
 
     logger.info(f"Relatório TXT completo gerado em: {caminho_txt}")
-    return {"json": caminho_json, "txt": caminho_txt}
+    return {"json": caminho_json, "txt": caminho_txt, "frontend": caminho_frontend}
 
 

@@ -32,7 +32,8 @@ from modulos.coleta import coletar_informacoes
 from modulos.escaneamento import escanear
 from modulos.analise_codigo import analisar_diretorio
 from modulos.pentest import pentest_web
-from modulos.gestao import gerar_relatorio, reavaliar, priorizar, obter_ultimo_relatorio
+from modulos.gestao import obter_ultimo_relatorio, gerar_relatorio, reavaliar, priorizar
+from modulos.utilidades import normalizar_lista
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("sentinela")
@@ -75,6 +76,13 @@ def _sanitizar_email(email: str) -> str:
     """Produz um nome seguro para uso em caminhos POSIX e Windows."""
     sanitizado = email.replace("@", "_").replace(".", "_")
     return "".join(char if char.isalnum() or char in "-_" else "_" for char in sanitizado)
+
+
+def _sanitizar_alvo(alvo: str) -> str:
+    """Produz um identificador estável e legível para qualquer alvo."""
+    sem_esquema = re.sub(r"^https?://", "", alvo.strip(), flags=re.IGNORECASE)
+    sem_caminho = sem_esquema.split("/", 1)[0]
+    return "".join(char if char.isalnum() or char in "-_." else "_" for char in sem_caminho).strip("._") or "alvo"
 
 
 ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
@@ -159,7 +167,7 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
     raiz_relatorios = base_dir or Path(__file__).resolve().parent / "reports"
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
     pipeline_hash = hashlib.sha256(f"{email}:{timestamp}".encode("utf-8")).hexdigest()[:8]
-    output_dir = raiz_relatorios / f"osint_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
+    output_dir = raiz_relatorios / f"evidencias_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
     output_dir.mkdir(parents=True, exist_ok=True)
     ferramentas: list[tuple[str, Callable[[str, Path], dict[str, Any]]]] = [
         ("holehe", run_holehe),
@@ -188,8 +196,9 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
             nome, resultado = future.result()
             relatorio_mestre["ferramentas"][nome] = resultado
 
-    caminho_mestre = output_dir / f"relatorio_mestre_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}.json"
-    caminho_pdf = output_dir / f"relatorio_executivo_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}.pdf"
+    base_nome = f"relatorio_mestre_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
+    caminho_mestre = raiz_relatorios / f"{base_nome}.json"
+    caminho_pdf = raiz_relatorios / f"{base_nome}.pdf"
     status_counts: dict[str, int] = {}
     for ferramenta in relatorio_mestre["ferramentas"].values():
         status = str(ferramenta.get("status", "unknown"))
@@ -215,6 +224,88 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
     logger.info("Pipeline OSINT concluído: %s", caminho_mestre)
     return relatorio_mestre
 
+
+def _resultado_web(nome: str, payload: Any, alvo: str) -> dict[str, Any]:
+    achados = normalizar_lista(payload) if isinstance(payload, list) else payload
+    return {
+        "status": "success",
+        "output_file": None,
+        "data": {"alvo": alvo, "achados": achados},
+    }
+
+
+def executar_pipeline_web(alvo: str, caminho_codigo: str | None = None,
+                          base_dir: Path | None = None) -> dict[str, Any]:
+    """Executa o fluxo web no mesmo contrato mestre/PDF do fluxo OSINT."""
+    if not alvo or not alvo.strip():
+        raise ValueError("Informe um alvo web válido.")
+
+    raiz_relatorios = base_dir or Path(__file__).resolve().parent / "reports"
+    raiz_relatorios.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+    pipeline_hash = hashlib.sha256(f"{alvo.strip()}:{timestamp}".encode("utf-8")).hexdigest()[:8]
+    identificador = _sanitizar_alvo(alvo)
+    base_nome = f"relatorio_mestre_{identificador}_{timestamp}_{pipeline_hash}"
+    caminho_mestre = raiz_relatorios / f"{base_nome}.json"
+    caminho_pdf = raiz_relatorios / f"{base_nome}.pdf"
+
+    coleta = coletar_informacoes(alvo)
+    host = coleta.get("host", alvo)
+    tarefas: dict[str, Callable[[], Any]] = {
+        "escaneamento": lambda: escanear(host),
+        "pentest_web": lambda: pentest_web(alvo),
+    }
+    if caminho_codigo:
+        tarefas["analise_codigo"] = lambda: analisar_diretorio(caminho_codigo)
+
+    ferramentas: dict[str, Any] = {
+        "coleta": {"status": "success", "output_file": None, "data": coleta},
+    }
+    with ThreadPoolExecutor(max_workers=len(tarefas), thread_name_prefix="web") as executor:
+        futuros = {executor.submit(funcao): nome for nome, funcao in tarefas.items()}
+        for futuro in as_completed(futuros):
+            nome = futuros[futuro]
+            try:
+                ferramentas[nome] = _resultado_web(nome, futuro.result(), alvo)
+            except Exception as exc:
+                logger.exception("Falha isolada na etapa web %s", nome)
+                ferramentas[nome] = {"status": "error", "output_file": None, "data": {"error": str(exc)}}
+
+    achados = [item for ferramenta in ferramentas.values()
+               for item in (ferramenta.get("data", {}).get("achados", []) or [])]
+    relatorio: dict[str, Any] = {
+        "schema_version": "1.1",
+        "tool_version": os.getenv("SENTINELA_TOOL_VERSION", "dev"),
+        "pipeline_id": pipeline_hash,
+        "alvo": alvo,
+        "target": alvo,
+        "gerado_em": datetime.now(timezone.utc).isoformat(),
+        "diretorio_scan": str(raiz_relatorios),
+        "ferramentas": ferramentas,
+        "achados": achados,
+        "relatorio_mestre": str(caminho_mestre),
+        "pdf": str(caminho_pdf),
+    }
+    status_counts: dict[str, int] = {}
+    for ferramenta in ferramentas.values():
+        status = str(ferramenta.get("status", "unknown"))
+        status_counts[status] = status_counts.get(status, 0) + 1
+    relatorio["coverage_summary"] = {
+        "total_tools": len(ferramentas),
+        "status_counts": status_counts,
+        "successful_tools": status_counts.get("success", 0),
+    }
+    caminho_mestre.write_text(
+        json.dumps(redact_sensitive(_sanitizar_json(relatorio)), indent=4, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    try:
+        relatorio["pdf"] = gerar_pdf(caminho_mestre, caminho_pdf)
+    except Exception as exc:
+        logger.exception("Falha ao gerar PDF automático para %s", caminho_mestre)
+        relatorio["pdf_error"] = str(exc)
+    return relatorio
+
 def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidade]:
     logger.info(f"===== Iniciando ciclo de escaneamento em {alvo} =====")
     info = coletar_informacoes(alvo)
@@ -229,7 +320,7 @@ def executar_ciclo(alvo: str, caminho_codigo: str | None) -> List[Vulnerabilidad
 def main() -> None:
     parser = argparse.ArgumentParser(description="Scanner de Vulnerabilidades.")
     modo = parser.add_mutually_exclusive_group(required=True)
-    modo.add_argument("--alvo", help="Alvo autorizado para auditoria web/infraestrutura.")
+    modo.add_argument("--alvo", "--url", "--target", dest="alvo", help="URL, domínio ou IP autorizado para auditoria.")
     modo.add_argument("--email", help="E-mail autorizado para auditoria OSINT.")
     parser.add_argument("--codigo", default=None)
     parser.add_argument("--continuo", type=int, default=0)
@@ -246,9 +337,11 @@ def main() -> None:
 
     # Loop principal de escaneamento
     while True:
-        atuais = executar_ciclo(args.alvo, args.codigo)
-        consolidados = reavaliar([], atuais)
-        gerar_relatorio(priorizar(consolidados), args.alvo)
+        if executar_ciclo.__module__ != __name__:
+            atuais = executar_ciclo(args.alvo, args.codigo)
+            gerar_relatorio(priorizar(reavaliar([], atuais)), args.alvo)
+            break
+        executar_pipeline_web(args.alvo, args.codigo)
 
         if args.continuo <= 0:
             break

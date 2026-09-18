@@ -192,6 +192,25 @@ def _confirmed_tool(tool: Dict[str, Any]) -> bool:
     return str((tool or {}).get("status", "")).lower() == "success"
 
 
+def _target(report: Dict[str, Any]) -> str:
+    return str(report.get("alvo") or report.get("target") or report.get("email") or "n/d")
+
+
+def _web_finding(item: Dict[str, Any]) -> Dict[str, Any]:
+    severity = str(item.get("severidade", "MEDIA")).upper()
+    severity = {"CRITICA": "CRÍTICO", "ALTA": "ALTO", "MEDIA": "MÉDIO", "BAIXA": "BAIXO"}.get(severity, severity)
+    return {
+        "origem": item.get("origem") or item.get("categoria") or "web",
+        "titulo": item.get("titulo") or "Achado técnico",
+        "evidencia": item.get("evidencia") or item.get("descricao") or "n/d",
+        "impacto": item.get("descricao") or "Exposição técnica identificada no alvo.",
+        "severidade": severity,
+        "probabilidade": item.get("probabilidade", "Média"),
+        "riscos": item.get("riscos", "Revisar a exposição e validar o contexto do achado."),
+        "mitigacao": item.get("mitigacao") or "Corrigir a configuração e reexecutar a validação.",
+    }
+
+
 def _paragraph_text(value: Any) -> str:
     return escape(clean_raw_message(str(value)))
 
@@ -330,7 +349,9 @@ def classify_failure(message: str) -> Dict[str, Any]:
 def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
     email = report.get("email", "")
     tools: Dict[str, Any] = report.get("ferramentas") or {}
-    findings: List[Dict[str, Any]] = []
+    findings: List[Dict[str, Any]] = [_web_finding(item) for item in report.get("achados", []) if isinstance(item, dict)]
+    if not findings:
+        findings = [_web_finding(item) for tool in tools.values() for item in ((tool or {}).get("data", {}).get("achados", []) or []) if isinstance(item, dict)]
 
     for name in sorted(tools):
         tool = tools[name] or {}
@@ -595,11 +616,11 @@ def kv_table(rows: Iterable[Tuple[str, str]], styles: Dict[str, ParagraphStyle],
 # --------------------------------------------------------------------------- #
 def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
                 width: float, analista: str) -> List[Any]:
-    email = report.get("email") or "n/d"
+    alvo = _target(report)
     tools: Dict[str, Any] = report.get("ferramentas") or {}
     findings = build_findings(report)
     holehe_hits = [item for item in parse_holehe(tools.get("holehe", {}))["confirmed"] if "." in item]
-    _, sherlock_discarded = parse_sherlock(tools.get("sherlock", {}), email)
+    _, sherlock_discarded = parse_sherlock(tools.get("sherlock", {}), report.get("email", ""))
     h8_verdict, _ = parse_h8mail(tools.get("h8mail", {})) if "h8mail" in tools else ("n/d", [])
 
     counts: Dict[str, int] = {}
@@ -616,7 +637,7 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
 
     story.append(section("1. Cabeçalho Executivo", styles))
     story.append(kv_table([
-        ("Alvo auditado", email),
+        ("Alvo auditado", alvo),
         ("Telemetria (geração)", _fmt_datetime(report.get("gerado_em"))),
         ("Analista responsável", analista),
         ("Diretório da coleta", report.get("diretorio_scan") or "n/d"),
@@ -649,11 +670,18 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
     story.append(summary)
 
     story.append(Spacer(1, 4))
-    story.append(Paragraph(
-        f"A varredura consultou {len(tools)} scanners OSINT contra o alvo <b>{escape(str(email))}</b>. "
-        f"Verificação de vazamentos: <b>{escape(str(h8_verdict))}</b>. Consolidados <b>{len(findings)} achados</b>. "
-        f"Resultados genéricos descartados como falso positivo: {sherlock_discarded}.", styles["body"]
-    ))
+    if report.get("email"):
+        descricao = (
+            f"A varredura consultou {len(tools)} scanners OSINT contra o alvo <b>{escape(str(alvo))}</b>. "
+            f"Verificação de vazamentos: <b>{escape(str(h8_verdict))}</b>. Consolidados <b>{len(findings)} achados</b>. "
+            f"Resultados genéricos descartados como falso positivo: {sherlock_discarded}."
+        )
+    else:
+        descricao = (
+            f"A avaliação web consolidou coleta DNS/HTTP, exposição de portas e verificações de segurança "
+            f"contra <b>{escape(str(alvo))}</b>, totalizando <b>{len(findings)} achados técnicos</b>."
+        )
+    story.append(Paragraph(descricao, styles["body"]))
 
     # --- Seção 2: Matriz de Ferramentas ---
     story.append(section("2. Matriz de Ferramentas OSINT", styles))
@@ -693,7 +721,7 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
 
     # --- Seção 3: Destaques de Segurança ---
     story.append(section("3. Destaques de Segurança", styles))
-    if holehe_hits:
+    if report.get("email") and holehe_hits:
         story.append(Paragraph(f"Contas confirmadas via Holehe ({len(holehe_hits)}):", styles["h2"]))
         columns = 3
         rows: List[List[Any]] = []
@@ -709,8 +737,10 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
             ("ROWBACKGROUNDS", (0, 0), (-1, -1), [PAPER, ZEBRA]),
         ]))
         story.append(hits)
-    else:
+    elif report.get("email"):
         story.append(Paragraph("Nenhuma conta atrelada ao e-mail foi confirmada positivamente pelos módulos de consulta.", styles["body"]))
+    else:
+        story.append(Paragraph("Evidências web, incluindo headers, certificados, serviços e recursos expostos, são detalhadas na matriz de riscos abaixo.", styles["body"]))
 
     # --- Seção 4: Matriz de Falhas e Riscos ---
     story.append(section("4. Falhas Encontradas, Impacto e Risco", styles))
@@ -907,7 +937,7 @@ def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe d
 
     canvas_maker = NumberedCanvas
     canvas_maker.watermark_path = watermark or os.path.join("assets", "watermark.png")
-    canvas_maker.header_subtitle = f"Alvo: {report.get('email', 'n/d')}"
+    canvas_maker.header_subtitle = f"Alvo: {_target(report)}"
 
     template = PageTemplate(id="Executive", frames=frame)
     doc.addPageTemplates([template])
