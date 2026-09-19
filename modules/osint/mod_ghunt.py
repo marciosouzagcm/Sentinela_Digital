@@ -21,13 +21,20 @@ def _resolver_cookies_ghunt() -> str | None:
         caminhos.append(Path(valor))
     caminhos.extend(
         [
+            Path(__file__).resolve().parents[2] / "cookies.json",
             Path.cwd() / "cookies.json",
             Path.home() / ".config" / "ghunt" / "cookies.json",
             Path.home() / ".ghunt" / "cookies.json",
         ]
     )
+    vistos = set()
     for caminho in caminhos:
-        if caminho.exists():
+        caminho = caminho.expanduser()
+        chave = str(caminho.resolve())
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        if caminho.is_file():
             return str(caminho)
     return None
 

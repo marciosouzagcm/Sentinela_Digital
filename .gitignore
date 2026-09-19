@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# GHunt credentials (never commit browser cookies or authentication material)
+cookies.json
+**/cookies.json
+*.cookies
+*.cookie
+ghunt*.cookies
+ghunt*.cookie
+ghunt*credentials*
+ghunt*credential*
+.ghunt/
+**/.ghunt/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

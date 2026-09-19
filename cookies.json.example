@@ -1,0 +1,15 @@
+[
+  {
+    "domain": ".google.com",
+    "expirationDate": 0,
+    "hostOnly": false,
+    "httpOnly": true,
+    "name": "COOKIE_NAME",
+    "path": "/",
+    "sameSite": "no_restriction",
+    "secure": true,
+    "session": false,
+    "storeId": null,
+    "value": "REPLACE_WITH_LOCAL_COOKIE_VALUE"
+  }
+]
