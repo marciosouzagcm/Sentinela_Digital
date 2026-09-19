@@ -2,7 +2,7 @@ from pathlib import Path
 
 from main import _executar_ferramenta, executar_pipeline_web, redact_sensitive
 from modulos.utilidades import Vulnerabilidade
-from pdf_generator import _calcular_score_exposicao, parse_ghunt, parse_holehe
+from pdf_generator import _calcular_score_exposicao, _plano_de_acao, parse_ghunt, parse_holehe
 
 
 def test_redact_sensitive_masks_credentials_and_calendar_urls():
@@ -95,3 +95,22 @@ def test_web_pipeline_writes_master_json_and_pdf_to_reports(tmp_path, monkeypatc
     assert mestre.exists()
     assert pdf.exists()
     assert pdf.stat().st_size > 0
+
+
+def test_action_plan_is_specific_to_identity_or_web_targets():
+    identity_plan = " ".join(acao for _, acao in _plano_de_acao({"email": "user@example.com"}, [{"titulo": "breach"}]))
+    web_plan = " ".join(acao for _, acao in _plano_de_acao({"alvo": "https://example.com"}, [{"titulo": "header"}]))
+
+    assert "MFA" in identity_plan
+    assert "gerenciador de senhas" in identity_plan
+    assert "WAF" in web_plan
+    assert "SSL" in web_plan
+    assert "MFA" not in web_plan
+
+
+def test_empty_findings_plan_only_recommends_maintenance():
+    plan = " ".join(acao for _, acao in _plano_de_acao({"alvo": "https://example.com"}, []))
+
+    assert "monitoramento" in plan.lower()
+    assert "Fechar portas" not in plan
+    assert "Nenhuma vulnerabilidade" not in plan

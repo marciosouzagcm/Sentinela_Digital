@@ -611,6 +611,31 @@ def kv_table(rows: Iterable[Tuple[str, str]], styles: Dict[str, ParagraphStyle],
     return table
 
 
+def _plano_de_acao(report: Dict[str, Any], findings: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
+    """Seleciona recomendações coerentes com o tipo e o resultado da varredura."""
+    if not findings:
+        return [
+            ("Contínuo", "Manter o inventário de ativos atualizado e realizar monitoramento contínuo da superfície de exposição."),
+            ("Periódico", "Reexecutar a avaliação em janela regular e revisar alertas, logs e dependências."),
+            ("Governança", "Registrar a evidência desta varredura como baseline e revisar a postura após alterações."),
+        ]
+
+    if report.get("email"):
+        return [
+            ("Imediato (0-48h)", "Trocar credenciais associadas a vazamentos confirmados e ativar MFA/TOTP nas contas expostas."),
+            ("Curto Prazo (1-2 sem.)", "Adotar um gerenciador de senhas, eliminar reutilização de credenciais e remover contas inativas."),
+            ("Médio Prazo (30-90 dias)", "Solicitar remoção de dados desnecessários, revisar recuperação de contas e reduzir a presença digital."),
+            ("Contínuo", "Monitorar novos vazamentos e reavaliar periodicamente serviços vinculados à identidade."),
+        ]
+
+    return [
+        ("Imediato (0-48h)", "Fechar portas sensíveis expostas e restringir o acesso administrativo por firewall, VPN e allowlist."),
+        ("Curto Prazo (1-2 sem.)", "Aplicar WAF e corrigir headers HTTP de segurança, incluindo HSTS, CSP e proteção contra clickjacking."),
+        ("Médio Prazo (30-90 dias)", "Renovar certificados SSL antes do vencimento, revisar TLS e remover banners de versão do servidor."),
+        ("Contínuo", "Monitorar portas, certificados, subdomínios e headers após cada mudança de infraestrutura."),
+    ]
+
+
 # --------------------------------------------------------------------------- #
 # Construção do PDF
 # --------------------------------------------------------------------------- #
@@ -788,19 +813,23 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
             f_cmds.append(("BACKGROUND", (0, idx), (1, idx), ZEBRA))
             f_cmds.append(("BACKGROUND", (3, idx), (-1, idx), ZEBRA))
 
-    findings_table = Table(f_data, colWidths=col_widths, repeatRows=1)
-    findings_table.setStyle(TableStyle(f_cmds))
-    story.append(findings_table)
+    if findings:
+        findings_table = Table(f_data, colWidths=col_widths, repeatRows=1)
+        findings_table.setStyle(TableStyle(f_cmds))
+        story.append(findings_table)
+    else:
+        story.append(Paragraph(
+            "Nenhuma vulnerabilidade foi detectada nesta varredura. A ausência de achados representa o estado observado no momento da coleta; mantenha o monitoramento contínuo.",
+            styles["body"],
+        ))
 
     # --- Seção 5: Plano de Ação ---
     story.append(section("5. Plano de Ação e Higiene Digital", styles))
-    plan_data = [
-        [Paragraph("<b>Horizonte</b>", styles["cellhead"]), Paragraph("<b>Ações Recomendadas</b>", styles["cellhead"])],
-        [Paragraph("<b>Imediato (0-48h)</b>", styles["small"]), Paragraph("Trocar senhas dos serviços expostos e ativar Autenticação em Duas Etapas (MFA/TOTP).", styles["small"])],
-        [Paragraph("<b>Curto Prazo (1-2 sem.)</b>", styles["small"]), Paragraph("Adotar gerenciador de senhas e encerrar contas inativas atreladas ao e-mail.", styles["small"])],
-        [Paragraph("<b>Médio Prazo (30-90 dias)</b>", styles["small"]), Paragraph("Corrigir dependências e chaves do ambiente de coleta OSINT para eliminar lacunas.", styles["small"])],
-        [Paragraph("<b>Contínuo</b>", styles["small"]), Paragraph("Monitoramento periódico de exposição de credenciais e auditoria de presença digital.", styles["small"])],
-    ]
+    plan_data = [[Paragraph("<b>Horizonte</b>", styles["cellhead"]), Paragraph("<b>Ações Recomendadas</b>", styles["cellhead"])]]
+    plan_data.extend([
+        [Paragraph(f"<b>{escape(horizonte)}</b>", styles["small"]), Paragraph(escape(acao), styles["small"])]
+        for horizonte, acao in _plano_de_acao(report, findings)
+    ])
     plan_table = Table(plan_data, colWidths=[0.25 * width, 0.75 * width], repeatRows=1)
     plan_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), NAVY),
