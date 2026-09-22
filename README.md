@@ -1,3 +1,4 @@
+
 # Sentinela Digital
 
 Orquestrador modular de segurança para auditorias autorizadas de aplicações, infraestrutura e identidades digitais. O projeto combina uma API FastAPI, um dashboard React/Vite e uma CLI Python com dois modos de entrada.
