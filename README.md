@@ -166,6 +166,21 @@ pytest -q
 python main.py --help
 ```
 
+### Cobertura dos adaptadores OSINT
+
+Com `pytest-cov` instalado, valide especificamente os adaptadores com:
+
+```bash
+pytest --cov=modules/osint --cov-report=term-missing
+```
+
+O teste isolado dos adaptadores pode ser executado com `PYTHONPATH=.` em ambientes
+que não incluem a raiz do projeto automaticamente:
+
+```bash
+PYTHONPATH=. pytest -q tests/test_mod_osint.py
+```
+
 ## Stack
 
 Python, FastAPI, Uvicorn, React, Vite, Tailwind CSS, Scapy, Nmap, `pip-audit`, Holehe, h8mail, recon-ng, theHarvester, EmailHarvester, Sherlock, Maltego, Gitleaks, GHunt, Render e Vercel.

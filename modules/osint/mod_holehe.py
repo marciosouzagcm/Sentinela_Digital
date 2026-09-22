@@ -13,6 +13,18 @@ def _limpar_saida(raw_output: str) -> str:
     return ANSI_ESCAPE_RE.sub("", raw_output or "").strip()
 
 
+def _classificar_linhas(lines: list[str]) -> dict[str, list[str]]:
+    categorias = {"confirmed": [], "rate_limited": [], "negative": []}
+    for line in lines:
+        match = re.match(r"^\s*\[([+x-])\]\s*(\S+)", line, re.IGNORECASE)
+        if not match:
+            continue
+        marcador, servico = match.group(1).lower(), match.group(2).rstrip(",;")
+        categoria = {"+": "confirmed", "x": "rate_limited", "-": "negative"}[marcador]
+        categorias[categoria].append(servico)
+    return {chave: sorted(set(valores)) for chave, valores in categorias.items()}
+
+
 def _obter_timeout() -> int:
     try:
         return max(10, int(os.getenv("OSINT_TIMEOUT_SECONDS", "120")))
@@ -43,7 +55,19 @@ def run_holehe(email: str, output_dir: Path) -> dict[str, Any]:
         lowered = raw_output.lower()
         if "rate limit" in lowered or "[x]" in raw_output:
             status = "rate_limited"
-        data = {"returncode": result.returncode, "timeout_seconds": timeout, "rate_limit_delay": delay, "lines": [line.strip() for line in raw_output.splitlines() if line.strip()]}
+        lines = [line.strip() for line in raw_output.splitlines() if line.strip()]
+        categorias = _classificar_linhas(lines)
+        data = {
+            "returncode": result.returncode,
+            "timeout_seconds": timeout,
+            "rate_limit_delay": delay,
+            "lines": lines,
+            "contas_confirmadas": categorias["confirmed"],
+            "contas_limite_taxa": categorias["rate_limited"],
+            "nao_registrado": categorias["negative"],
+            # Mantém o contrato consumido pelo gerador de PDF legado.
+            **categorias,
+        }
     except FileNotFoundError as exc:
         raw_output = f"Ferramenta não encontrada no PATH: {exc}"
         status, data = "unavailable", {"error": str(exc), "timeout_seconds": timeout, "rate_limit_delay": delay}

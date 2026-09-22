@@ -1,5 +1,7 @@
 """Adaptador independente para o Maltego."""
 from pathlib import Path
+import os
+import shutil
 import subprocess
 from typing import Any
 
@@ -7,6 +9,19 @@ from typing import Any
 def run_maltego(email: str, output_dir: Path) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / "maltego.txt"
+    reason = (
+        "Maltego exige interface gráfica e autenticação/licença; ambiente CLI/headless detectado."
+    )
+    headless = os.name != "nt" and not (os.getenv("DISPLAY") or os.getenv("WAYLAND_DISPLAY"))
+    if headless or shutil.which("maltego") is None:
+        if not headless:
+            reason = "Executável Maltego não encontrado; verificação GUI não realizada."
+        output_file.write_text(reason, encoding="utf-8")
+        return {
+            "status": "skipped",
+            "output_file": str(output_file),
+            "data": {"reason": reason, "headless": headless},
+        }
     command = ["maltego", "--transform", "email", email]
     try:
         result = subprocess.run(

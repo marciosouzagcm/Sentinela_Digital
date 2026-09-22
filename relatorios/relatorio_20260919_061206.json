@@ -1,6 +1,6 @@
 {
   "alvo": "https://example.com",
-  "gerado_em": "2026-09-18T23:08:50.645454",
+  "gerado_em": "2026-09-19T06:12:06.362010",
   "metricas": {
     "TOTAL": 1,
     "CORRIGIDAS": 0,
@@ -20,7 +20,7 @@
         "severidade": "MEDIA",
         "evidencia": "Configuração",
         "mitigacao": "Corrigir configuração.",
-        "descoberta_em": "2026-09-18T23:08:50.645454",
+        "descoberta_em": "2026-09-19T06:12:06.362010",
         "corrigida": false
       }
     ]

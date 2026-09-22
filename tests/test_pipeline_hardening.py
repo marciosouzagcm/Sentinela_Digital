@@ -2,7 +2,7 @@ from pathlib import Path
 
 from main import _executar_ferramenta, executar_pipeline_web, redact_sensitive
 from modulos.utilidades import Vulnerabilidade
-from pdf_generator import _calcular_score_exposicao, _plano_de_acao, parse_ghunt, parse_holehe
+from pdf_generator import _calcular_score_exposicao, _plano_de_acao, build_findings, parse_ghunt, parse_holehe
 
 
 def test_redact_sensitive_masks_credentials_and_calendar_urls():
@@ -56,6 +56,33 @@ def test_ghunt_parser_extracts_public_calendar_and_events():
     assert parsed["authenticated"] is True
     assert parsed["calendar_public"] is True
     assert parsed["event_count"] == 68
+
+
+def test_ghunt_parser_extracts_structured_calendar_events():
+    parsed = parse_ghunt({"status": "success", "data": {"json": {
+        "services": {"calendar": {"public": True, "events": [
+            {"start": {"dateTime": "2026-09-19T10:00:00Z"}, "summary": "Reunião"},
+            {"start": {"date": "2026-09-20"}, "title": "Viagem"},
+        ]}}
+    }}})
+
+    assert parsed["calendar_public"] is True
+    assert parsed["event_count"] == 2
+    assert parsed["events"] == [
+        {"date": "2026-09-19T10:00:00Z", "summary": "Reunião"},
+        {"date": "2026-09-20", "summary": "Viagem"},
+    ]
+
+
+def test_public_calendar_is_high_risk_finding():
+    findings = build_findings({"ferramentas": {"ghunt": {
+        "status": "success",
+        "data": {"services": {"calendar": {"public": True, "events": [{"summary": "Evento"}]}}},
+    }}})
+
+    calendar_finding = next(item for item in findings if item["origem"] == "ghunt")
+    assert calendar_finding["severidade"] == "ALTO"
+    assert "privado" in calendar_finding["mitigacao"]
 
 
 def test_precheck_marks_missing_binary_without_calling_adapter(tmp_path, monkeypatch):

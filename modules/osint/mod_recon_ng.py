@@ -18,7 +18,7 @@ def run_recon_ng(email: str, output_dir: Path) -> dict[str, Any]:
     resource_file.write_text(
         "\n".join(
             [
-                "workspace add sentinela",
+                "workspaces create sentinela",
                 "workspaces load sentinela",
                 "modules load recon/contacts-contacts",
                 "modules load profiler/templates",
@@ -42,12 +42,19 @@ def run_recon_ng(email: str, output_dir: Path) -> dict[str, Any]:
             check=False,
         )
         raw_output = _limpar_saida(result.stdout + (("\n[stderr]\n" + result.stderr) if result.stderr else ""))
-        status = "success" if result.returncode == 0 else "error"
+        command_failed = result.returncode != 0 or bool(re.search(
+            r"Invalid command|Invalid workspace|Invalid module|Invalid option|Error:",
+            raw_output,
+            re.IGNORECASE,
+        ))
+        status = "error" if command_failed else "success"
         data = {
             "returncode": result.returncode,
             "resource_file": str(resource_file),
             "lines": [line.strip() for line in raw_output.splitlines() if line.strip()],
         }
+        if command_failed and result.returncode == 0:
+            data["error"] = "Recon-ng reportou erro no resource file apesar do código de saída 0."
     except FileNotFoundError as exc:
         raw_output, status, data = f"Ferramenta não encontrada no PATH: {exc}", "unavailable", {"error": str(exc), "resource_file": str(resource_file)}
     except subprocess.TimeoutExpired as exc:

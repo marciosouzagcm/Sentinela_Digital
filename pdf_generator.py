@@ -63,6 +63,7 @@ BLUE = colors.HexColor("#1971C2")
 
 STATUS_COLORS: Dict[str, colors.Color] = {
     "success": GREEN,
+    "warning": ORANGE,
     "error": RED,
     "skipped": GREY,
     "rate_limited": ORANGE,
@@ -73,6 +74,7 @@ STATUS_COLORS: Dict[str, colors.Color] = {
 
 STATUS_LABELS: Dict[str, str] = {
     "success": "SUCESSO",
+    "warning": "AVISO",
     "error": "ERRO",
     "skipped": "IGNORADO",
     "rate_limited": "LIMITE TAXA",
@@ -143,6 +145,61 @@ def _lines(tool: Dict[str, Any]) -> List[str]:
     return [str(item) for item in raw]
 
 
+def _calendar_payload(value: Any) -> Optional[Dict[str, Any]]:
+    if isinstance(value, dict):
+        services = value.get("services")
+        if isinstance(services, dict) and isinstance(services.get("calendar"), dict):
+            return services["calendar"]
+        for item in value.values():
+            found = _calendar_payload(item)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for item in value:
+            found = _calendar_payload(item)
+            if found is not None:
+                return found
+    return None
+
+
+def _json_lines(tool: Dict[str, Any]) -> List[Any]:
+    values: List[Any] = []
+    data = tool.get("data") or {}
+    for key in ("json", "result", "response", "payload"):
+        value = data.get(key)
+        if isinstance(value, (dict, list)):
+            values.append(value)
+        elif isinstance(value, str):
+            try:
+                values.append(json.loads(value))
+            except json.JSONDecodeError:
+                pass
+    for line in _lines(tool):
+        try:
+            values.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return values
+
+
+def _calendar_events(calendar: Dict[str, Any]) -> List[Dict[str, str]]:
+    raw_events = calendar.get("events") or calendar.get("items") or []
+    if not isinstance(raw_events, list):
+        return []
+    events = []
+    for item in raw_events:
+        if not isinstance(item, dict):
+            continue
+        start = item.get("start")
+        if isinstance(start, dict):
+            date = start.get("dateTime") or start.get("date") or start.get("value")
+        else:
+            date = start or item.get("date") or item.get("datetime")
+        summary = item.get("summary") or item.get("title") or item.get("name") or "Evento sem título"
+        events.append({"date": str(date or "n/d"), "summary": str(summary)})
+    return events
+
+
 def _fmt_datetime(value: Optional[str]) -> str:
     if not value:
         return "n/d"
@@ -171,19 +228,29 @@ def parse_holehe(tool: Dict[str, Any]) -> Dict[str, List[str]]:
 
 
 def parse_ghunt(tool: Dict[str, Any]) -> Dict[str, Any]:
-    """Extrai sinais de exposição pública da saída textual do GHunt."""
+    """Extrai calendário público do JSON estruturado ou da saída textual do GHunt."""
+    data = tool.get("data") or {}
+    calendar = _calendar_payload(data)
+    if calendar is None:
+        for value in _json_lines(tool):
+            calendar = _calendar_payload(value)
+            if calendar is not None:
+                break
     lines = _lines(tool)
     text = "\n".join(lines).lower()
     services = []
     for service in ("youtube", "photos", "maps", "meet", "calendar", "play games"):
         if service in text and ("activated" in text or "services" in text or "data" in text):
             services.append(service)
-    calendar_public = "public google calendar found" in text
+    calendar_public = bool(calendar and calendar.get("public") is True) or "public google calendar found" in text
     event_match = re.search(r"(\d+)\s+events? dumped", text)
+    events = _calendar_events(calendar) if calendar else []
+    event_count = len(events) or (int(event_match.group(1)) if event_match else 0)
     return {
         "authenticated": "authenticated" in text,
         "calendar_public": calendar_public,
-        "event_count": int(event_match.group(1)) if event_match else 0,
+        "event_count": event_count,
+        "events": events,
         "services": sorted(set(services)),
     }
 
@@ -194,6 +261,40 @@ def _confirmed_tool(tool: Dict[str, Any]) -> bool:
 
 def _target(report: Dict[str, Any]) -> str:
     return str(report.get("alvo") or report.get("target") or report.get("email") or "n/d")
+
+
+def _target_category(report: Dict[str, Any]) -> str:
+    """Seleciona o foco editorial sem depender de um campo novo no JSON."""
+    return "identity" if report.get("email") or "@" in _target(report) else "infrastructure"
+
+
+def _tool_has_relevant_output(tool: Dict[str, Any]) -> bool:
+    if str(tool.get("status", "")).lower() not in {"success", "partial", "rate_limited"}:
+        return False
+    data = tool.get("data") or {}
+    if data.get("achados") or data.get("contas_confirmadas") or data.get("rate_limited"):
+        return True
+    lines = " ".join(_lines(tool) + [str(item) for item in tool.get("destaques") or []]).lower()
+    return bool(lines) and not re.search(
+        r"no results?|no result found|no leaks? found|not compromised|nenhum achado|sem resultados",
+        lines,
+        re.IGNORECASE,
+    )
+
+
+def _risk_badge(findings: List[Dict[str, Any]], styles: Dict[str, ParagraphStyle]) -> Table:
+    severities = [str(item.get("severidade", "")).upper() for item in findings]
+    level = "CRÍTICO" if "CRÍTICO" in severities else "MÉDIO" if any(item in severities for item in ("ALTO", "MÉDIO")) else "SEGURO"
+    color = RED if level == "CRÍTICO" else ORANGE if level == "MÉDIO" else GREEN
+    badge = Table([[Paragraph(f"<b>POSTURA: {level}</b>", styles["small_center"])]], colWidths=[115])
+    badge.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), color),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]))
+    return badge
 
 
 def _web_finding(item: Dict[str, Any]) -> Dict[str, Any]:
@@ -435,10 +536,10 @@ def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "titulo": "Calendário Google público identificado",
                 "evidencia": f"{ghunt_data['event_count']} evento(s) reportado(s) como públicos.",
                 "impacto": "Metadados de agenda podem revelar rotina, localização e vínculos.",
-                "severidade": "MÉDIO",
+                "severidade": "ALTO",
                 "probabilidade": "Alta",
-                "riscos": "Exposição de rotina e uso em engenharia social direcionada.",
-                "mitigacao": "Revisar compartilhamento do calendário e remover eventos públicos desnecessários.",
+                "riscos": "Vazamento de rotina e engenharia social direcionada.",
+                "mitigacao": "Ajustar a visibilidade do Google Agenda para privado.",
             })
 
     # Deduplicação
@@ -659,6 +760,8 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
     story.append(Spacer(1, 2))
     story.append(Paragraph("Relatório Executivo de Inteligência OSINT", styles["title"]))
     story.append(Paragraph(f"{SYSTEM_NAME} · Avaliação de exposição digital e postura de segurança", styles["subtitle"]))
+    story.append(_risk_badge(findings, styles))
+    story.append(Spacer(1, 4))
 
     story.append(section("1. Cabeçalho Executivo", styles))
     story.append(kv_table([
@@ -709,7 +812,9 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
     story.append(Paragraph(descricao, styles["body"]))
 
     # --- Seção 2: Matriz de Ferramentas ---
-    story.append(section("2. Matriz de Ferramentas OSINT", styles))
+    category = _target_category(report)
+    focus_title = "2. Matriz de Identidade Digital" if category == "identity" else "2. Topologia de Infraestrutura"
+    story.append(section(focus_title, styles))
     head = ["Ferramenta", "Status", "Código", "Observação"]
     data = [[Paragraph(f"<b>{h}</b>", styles["cellhead"]) for h in head]]
     cmds = [
@@ -720,7 +825,8 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
         ("ALIGN", (1, 1), (2, -1), "CENTER"),
     ]
-    for row_index, name in enumerate(sorted(tools), start=1):
+    visible_tools = [name for name in sorted(tools) if _tool_has_relevant_output(tools[name] or {})]
+    for row_index, name in enumerate(visible_tools, start=1):
         tool = tools[name] or {}
         status = str(tool.get("status", "unknown")).lower()
         color = STATUS_COLORS.get(status, BLUE)
@@ -740,13 +846,27 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
             cmds.append(("BACKGROUND", (0, row_index), (0, row_index), ZEBRA))
             cmds.append(("BACKGROUND", (2, row_index), (-1, row_index), ZEBRA))
 
-    matrix = Table(data, colWidths=[0.20 * width, 0.16 * width, 0.09 * width, 0.55 * width], repeatRows=1)
-    matrix.setStyle(TableStyle(cmds))
-    story.append(matrix)
+    if visible_tools:
+        matrix = Table(data, colWidths=[0.20 * width, 0.16 * width, 0.09 * width, 0.55 * width], repeatRows=1)
+        matrix.setStyle(TableStyle(cmds))
+        story.append(matrix)
+    else:
+        story.append(Paragraph("Nenhuma ferramenta retornou evidência relevante para esta categoria de alvo.", styles["body"]))
 
     # --- Seção 3: Destaques de Segurança ---
-    story.append(section("3. Destaques de Segurança", styles))
-    if report.get("email") and holehe_hits:
+    story.append(section("3. Presença Web e Evidências" if category == "identity" else "3. Exposição de Serviços e Headers", styles))
+    ghunt_data = parse_ghunt(tools.get("ghunt", {}))
+    if ghunt_data["calendar_public"]:
+        story.append(Paragraph(
+            f"Calendário público do Google Agenda identificado: <b>{ghunt_data['event_count']} evento(s) exposto(s)</b>.",
+            styles["body"],
+        ))
+        for event in ghunt_data["events"][:5]:
+            story.append(Paragraph(
+                f"{_paragraph_text(event['date'])} · {_paragraph_text(event['summary'])}",
+                styles["small"],
+            ))
+    elif report.get("email") and holehe_hits:
         story.append(Paragraph(f"Contas confirmadas via Holehe ({len(holehe_hits)}):", styles["h2"]))
         columns = 3
         rows: List[List[Any]] = []

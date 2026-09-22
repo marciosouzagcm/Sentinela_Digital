@@ -26,7 +26,7 @@ from modules.osint.mod_maltego import run_maltego
 from modules.osint.mod_recon_ng import run_recon_ng
 from modules.osint.mod_sherlock import run_sherlock
 from modules.osint.mod_theharvester import run_theharvester
-from pdf_generator import gerar_pdf
+from pdf_generator import gerar_pdf, parse_ghunt
 from modulos.utilidades import Vulnerabilidade
 from modulos.coleta import coletar_informacoes
 from modulos.escaneamento import escanear
@@ -195,6 +195,14 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
         for future in as_completed(futures):
             nome, resultado = future.result()
             relatorio_mestre["ferramentas"][nome] = resultado
+
+    ghunt_data = parse_ghunt(relatorio_mestre["ferramentas"].get("ghunt", {}))
+    if ghunt_data["calendar_public"]:
+        relatorio_mestre["ferramentas"]["ghunt"].setdefault("data", {})["calendar"] = {
+            "public": True,
+            "event_count": ghunt_data["event_count"],
+            "events": ghunt_data["events"],
+        }
 
     base_nome = f"relatorio_mestre_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
     caminho_mestre = raiz_relatorios / f"{base_nome}.json"
