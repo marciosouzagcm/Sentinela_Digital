@@ -22,6 +22,7 @@ from modules.osint.mod_ghunt import run_ghunt
 from modules.osint.mod_gitleaks import run_gitleaks
 from modules.osint.mod_h8mail import run_h8mail
 from modules.osint.mod_holehe import run_holehe
+from modules.osint.mod_blockchain import run_blockchain
 from modules.osint.mod_maltego import run_maltego
 from modules.osint.mod_recon_ng import run_recon_ng
 from modules.osint.mod_sherlock import run_sherlock
@@ -146,7 +147,8 @@ def _resultado_indisponivel(nome: str, output_dir: Path) -> dict[str, Any]:
 
 def _executar_ferramenta(nome: str, funcao: Callable[[str, Path], dict[str, Any]], email: str, output_dir: Path) -> tuple[str, dict[str, Any]]:
     inicio = time.perf_counter()
-    if shutil.which(PRECHECK_BINARIES[nome]) is None:
+    binary = PRECHECK_BINARIES.get(nome)
+    if binary and shutil.which(binary) is None:
         resultado = _resultado_indisponivel(nome, output_dir)
     else:
         try:
@@ -159,39 +161,48 @@ def _executar_ferramenta(nome: str, funcao: Callable[[str, Path], dict[str, Any]
     return nome, resultado
 
 
-def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[str, Any]:
+def executar_pipeline_osint(email: str | None = None, base_dir: Path | None = None, wallet: str | None = None) -> dict[str, Any]:
     """Executa os adaptadores OSINT, isolando falhas por ferramenta."""
-    if "@" not in email or email.startswith("@") or email.endswith("@"):
+    if email and ("@" not in email or email.startswith("@") or email.endswith("@")):
         raise ValueError("Informe um endereço de e-mail válido.")
+    if not email and not wallet:
+        raise ValueError("Informe um e-mail ou uma carteira EVM válida.")
 
     raiz_relatorios = base_dir or Path(__file__).resolve().parent / "reports"
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
-    pipeline_hash = hashlib.sha256(f"{email}:{timestamp}".encode("utf-8")).hexdigest()[:8]
-    output_dir = raiz_relatorios / f"evidencias_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
+    alvo_osint = email or wallet or ""
+    pipeline_hash = hashlib.sha256(f"{alvo_osint}:{timestamp}".encode("utf-8")).hexdigest()[:8]
+    identificador = _sanitizar_email(email) if email else _sanitizar_alvo(wallet or "wallet")
+    output_dir = raiz_relatorios / f"evidencias_{identificador}_{timestamp}_{pipeline_hash}"
     output_dir.mkdir(parents=True, exist_ok=True)
-    ferramentas: list[tuple[str, Callable[[str, Path], dict[str, Any]]]] = [
-        ("holehe", run_holehe),
-        ("h8mail", run_h8mail),
-        ("recon_ng", run_recon_ng),
-        ("theharvester", run_theharvester),
-        ("emailharvester", run_emailharvester),
-        ("sherlock", run_sherlock),
-        ("maltego", run_maltego),
-        ("gitleaks", run_gitleaks),
-        ("ghunt", run_ghunt),
-    ]
+    if email:
+        ferramentas: list[tuple[str, Callable[[str, Path], dict[str, Any]]]] = [
+            ("holehe", run_holehe),
+            ("h8mail", run_h8mail),
+            ("recon_ng", run_recon_ng),
+            ("theharvester", run_theharvester),
+            ("emailharvester", run_emailharvester),
+            ("sherlock", run_sherlock),
+            ("maltego", run_maltego),
+            ("gitleaks", run_gitleaks),
+            ("ghunt", run_ghunt),
+            ("blockchain", lambda alvo, pasta: run_blockchain(alvo, pasta, wallet)),
+        ]
+    else:
+        ferramentas = [("blockchain", lambda alvo, pasta: run_blockchain(alvo, pasta, wallet))]
     relatorio_mestre: dict[str, Any] = {
         "schema_version": "1.1",
         "tool_version": os.getenv("SENTINELA_TOOL_VERSION", "dev"),
         "pipeline_id": pipeline_hash,
         "email": email,
+        "wallet": wallet,
         "gerado_em": datetime.now(timezone.utc).isoformat(),
         "diretorio_scan": str(output_dir),
         "ferramentas": {},
     }
     logger.warning("OSINT autorizado: use o pipeline somente em ativos e identidades com autorização explícita.")
     with ThreadPoolExecutor(max_workers=3, thread_name_prefix="osint") as executor:
-        futures = [executor.submit(_executar_ferramenta, nome, funcao, email, output_dir) for nome, funcao in ferramentas]
+        futures = [executor.submit(_executar_ferramenta, nome, funcao, alvo_osint, output_dir) for nome, funcao in ferramentas]
         for future in as_completed(futures):
             nome, resultado = future.result()
             relatorio_mestre["ferramentas"][nome] = resultado
@@ -204,7 +215,7 @@ def executar_pipeline_osint(email: str, base_dir: Path | None = None) -> dict[st
             "events": ghunt_data["events"],
         }
 
-    base_nome = f"relatorio_mestre_{_sanitizar_email(email)}_{timestamp}_{pipeline_hash}"
+    base_nome = f"relatorio_mestre_{identificador}_{timestamp}_{pipeline_hash}"
     caminho_mestre = raiz_relatorios / f"{base_nome}.json"
     caminho_pdf = raiz_relatorios / f"{base_nome}.pdf"
     status_counts: dict[str, int] = {}
@@ -330,13 +341,18 @@ def main() -> None:
     modo = parser.add_mutually_exclusive_group(required=True)
     modo.add_argument("--alvo", "--url", "--target", dest="alvo", help="URL, domínio ou IP autorizado para auditoria.")
     modo.add_argument("--email", help="E-mail autorizado para auditoria OSINT.")
+    modo.add_argument("--wallet", help="Endereço EVM autorizado para auditoria blockchain.")
+    parser.add_argument("--wallet-correlacionada", dest="wallet_correlacionada", help="Carteira EVM opcional para correlacionar com o e-mail.")
     parser.add_argument("--codigo", default=None)
     parser.add_argument("--continuo", type=int, default=0)
     parser.add_argument("--sniffer", action="store_true")
     args = parser.parse_args()
 
     if args.email:
-        executar_pipeline_osint(args.email)
+        executar_pipeline_osint(args.email, wallet=args.wallet_correlacionada)
+        return
+    if args.wallet:
+        executar_pipeline_osint(wallet=args.wallet)
         return
 
     # Inicia o sniffer se solicitado

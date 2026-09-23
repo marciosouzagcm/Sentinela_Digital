@@ -11,6 +11,18 @@ node_modules
 dist
 dist-ssr
 *.local
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+
+# Relatórios gerados localmente; fixtures oficiais devem ficar em tests/fixtures.
+reports/*.pdf
+reports/*.json
+reports/*/relatorio_*.pdf
+reports/*/relatorio_*.json
 
 # GHunt credentials (never commit browser cookies or authentication material)
 cookies.json

@@ -1,4 +1,24 @@
 from pdf_generator import _calcular_score_exposicao, _nivel_risco_geral
+from pdf_generator import _coverage_incomplete
+
+
+def test_coverage_is_incomplete_when_more_than_half_scanners_fail():
+    assert _coverage_incomplete({
+        "ferramentas": {
+            "a": {"status": "unavailable"},
+            "b": {"status": "error"},
+            "c": {"status": "success"},
+            "d": {"status": "success"},
+        }
+    }) is False
+    assert _coverage_incomplete({
+        "ferramentas": {
+            "a": {"status": "unavailable"},
+            "b": {"status": "error"},
+            "c": {"status": "timeout"},
+            "d": {"status": "success"},
+        }
+    }) is True
 
 
 def test_score_and_risk_vector_are_based_on_confirmed_findings_only():

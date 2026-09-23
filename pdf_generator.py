@@ -80,6 +80,7 @@ STATUS_LABELS: Dict[str, str] = {
     "rate_limited": "LIMITE TAXA",
     "timeout": "TIMEOUT",
     "partial": "PARCIAL",
+    "unavailable": "INDISPONÍVEL",
     "unknown": "DESCONHECIDO",
 }
 
@@ -282,10 +283,14 @@ def _tool_has_relevant_output(tool: Dict[str, Any]) -> bool:
     )
 
 
-def _risk_badge(findings: List[Dict[str, Any]], styles: Dict[str, ParagraphStyle]) -> Table:
+def _risk_badge(findings: List[Dict[str, Any]], styles: Dict[str, ParagraphStyle], report: Dict[str, Any] | None = None) -> Table:
     severities = [str(item.get("severidade", "")).upper() for item in findings]
-    level = "CRÍTICO" if "CRÍTICO" in severities else "MÉDIO" if any(item in severities for item in ("ALTO", "MÉDIO")) else "SEGURO"
-    color = RED if level == "CRÍTICO" else ORANGE if level == "MÉDIO" else GREEN
+    if report and _coverage_incomplete(report):
+        level = "INCOMPLETA / REQUER REEXECUÇÃO"
+        color = ORANGE
+    else:
+        level = "CRÍTICO" if "CRÍTICO" in severities else "MÉDIO" if any(item in severities for item in ("ALTO", "MÉDIO")) else "SEGURO"
+        color = RED if level == "CRÍTICO" else ORANGE if level == "MÉDIO" else GREEN
     badge = Table([[Paragraph(f"<b>POSTURA: {level}</b>", styles["small_center"])]], colWidths=[115])
     badge.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), color),
@@ -295,6 +300,20 @@ def _risk_badge(findings: List[Dict[str, Any]], styles: Dict[str, ParagraphStyle
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     return badge
+
+
+def _coverage_incomplete(report: Dict[str, Any]) -> bool:
+    summary = report.get("coverage_summary") or {}
+    tools = report.get("ferramentas") or {}
+    total = int(summary.get("total_tools") or len(tools))
+    statuses = summary.get("status_counts") or {}
+    if not statuses:
+        statuses = {}
+        for tool in tools.values():
+            status = str((tool or {}).get("status", "unknown")).lower()
+            statuses[status] = statuses.get(status, 0) + 1
+    unavailable = sum(int(statuses.get(status, 0) or 0) for status in ("unavailable", "error", "timeout", "rate_limited", "skipped", "warning", "partial"))
+    return total > 0 and unavailable / total > 0.5
 
 
 def _web_finding(item: Dict[str, Any]) -> Dict[str, Any]:
@@ -760,7 +779,13 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
     story.append(Spacer(1, 2))
     story.append(Paragraph("Relatório Executivo de Inteligência OSINT", styles["title"]))
     story.append(Paragraph(f"{SYSTEM_NAME} · Avaliação de exposição digital e postura de segurança", styles["subtitle"]))
-    story.append(_risk_badge(findings, styles))
+    story.append(_risk_badge(findings, styles, report))
+    if _coverage_incomplete(report):
+        story.append(Paragraph(
+            "ALERTA DE COBERTURA: mais de 50% dos scanners falharam, foram limitados ou ficaram indisponíveis. "
+            "A postura não pode ser considerada segura; reexecute a coleta em ambiente habilitado antes de concluir a auditoria.",
+            styles["body"],
+        ))
     story.append(Spacer(1, 4))
 
     story.append(section("1. Cabeçalho Executivo", styles))
@@ -796,6 +821,12 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
         cmds.append(("BACKGROUND", (index, 0), (index, 0), color))
     summary.setStyle(TableStyle(cmds))
     story.append(summary)
+
+    if _coverage_incomplete(report):
+        story.append(Paragraph(
+            "A cobertura de segurança está comprometida pela indisponibilidade, limitação ou falha de mais da metade dos scanners.",
+            styles["body"],
+        ))
 
     story.append(Spacer(1, 4))
     if report.get("email"):
@@ -1046,7 +1077,9 @@ def _nivel_risco_geral(report: Dict[str, Any]) -> Tuple[str, List[str], int, int
     if _confirmed_tool(ghunt) and parse_ghunt(ghunt)["calendar_public"]:
         vetores.append("GHunt: calendário Google público")
 
-    if score >= 70:
+    if _coverage_incomplete(report):
+        nivel = "INCOMPLETA / REQUER REEXECUÇÃO"
+    elif score >= 70:
         nivel = "CRÍTICO"
     elif score >= 30:
         nivel = "ALTO"

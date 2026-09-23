@@ -81,7 +81,14 @@ python main.py --url https://seusite-autorizado.com --sniffer
 
 ```bash
 python main.py --email pessoa@example.com
+python main.py --wallet 0x0000000000000000000000000000000000000000
+python main.py --email pessoa@example.com --wallet-correlacionada 0x0000000000000000000000000000000000000000
 ```
+
+O modo `--wallet` consulta apenas o adaptador público de blockchain para evitar
+enviar um endereço EVM aos scanners de identidade. A correlação por e-mail é
+intencionalmente não determinística: domínios Web3 encontrados são sinalizados
+para validação autorizada, mas não são tratados como prova de propriedade.
 
 Cada execução gera o mesmo ciclo de entrega para e-mail e web:
 
@@ -157,7 +164,16 @@ O backend permanece publicado separadamente no Render.
 - O basename é compartilhado pelos artefatos: `relatorio_mestre_<alvo>_<timestamp>_<hash_curto>`.
 - O fluxo web inclui coleta DNS/HTTP, port scan, headers e recursos sensíveis como ferramentas do relatório mestre.
 - Ferramentas ausentes aparecem com status `unavailable`; o pipeline ainda gera o relatório mestre.
+- Quando mais de 50% dos scanners falham, sofrem limitação ou ficam indisponíveis,
+  o PDF classifica a postura como `INCOMPLETA / REQUER REEXECUÇÃO`.
 - Em ambientes efêmeros de hospedagem, arquivos locais podem ser perdidos após reinicialização ou novo deploy. Use armazenamento externo quando a retenção permanente for necessária.
+
+### Higienização de artefatos
+
+Arquivos temporários de geração e smoke tests não devem ficar na raiz. Relatórios
+de execução devem permanecer em `reports/` somente quando forem evidências oficiais
+ou fixtures; versões antigas e duplicadas devem ser arquivadas fora do repositório
+ou removidas após a confirmação da retenção necessária.
 
 ## Testes e validação
 
