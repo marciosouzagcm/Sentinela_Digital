@@ -19,6 +19,7 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
 from xml.sax.saxutils import escape
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -97,6 +98,28 @@ SYSTEM_NAME = "Sentinela Digital"
 
 FONT_REGULAR = "Helvetica"
 FONT_BOLD = "Helvetica-Bold"
+
+
+def resolve_brand_asset_path(base_dir: Optional[str] = None) -> Optional[str]:
+    """Resolve the official project logo from the repo root or local asset folders."""
+    candidates: List[str] = []
+    search_roots = [base_dir, str(Path(__file__).resolve().parent), os.getcwd()]
+    for root in search_roots:
+        if not root:
+            continue
+        candidates.extend([
+            os.path.join(root, "IMG-20260909-WA6745.jpg"),
+            os.path.join(root, "assets", "IMG-20260909-WA6745.jpg"),
+            os.path.join(root, "public", "IMG-20260909-WA6745.jpg"),
+            os.path.join(root, "public", "assets", "IMG-20260909-WA6745.jpg"),
+        ])
+    seen: set[str] = set()
+    for candidate in candidates:
+        normalized = os.path.normpath(candidate)
+        if normalized not in seen and os.path.exists(normalized):
+            return normalized
+        seen.add(normalized)
+    return None
 
 
 def _register_unicode_fonts() -> None:
@@ -584,7 +607,8 @@ def build_findings(report: Dict[str, Any]) -> List[Dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 class NumberedCanvas(rl_canvas.Canvas):
     watermark_path: Optional[str] = None
-    watermark_alpha: float = 0.05
+    logo_path: Optional[str] = None
+    watermark_alpha: float = 0.09
     header_title: str = SYSTEM_NAME
     header_subtitle: str = ""
 
@@ -641,9 +665,20 @@ class NumberedCanvas(rl_canvas.Canvas):
         self.rect(0, height - band, width, band, stroke=0, fill=1)
         self.setFillColor(CYAN)
         self.rect(0, height - band - 1.2, width, 1.2, stroke=0, fill=1)
+
+        logo_path = self.logo_path or resolve_brand_asset_path()
+        if logo_path and os.path.exists(logo_path):
+            try:
+                image = ImageReader(logo_path)
+                logo_width = 14 * mm
+                logo_height = 14 * mm
+                self.drawImage(image, 18 * mm, height - band + 2.2 * mm, width=logo_width, height=logo_height, mask='auto')
+            except Exception:
+                pass
+
         self.setFillColor(colors.white)
         self.setFont(FONT_BOLD, 10)
-        self.drawString(18 * mm, height - band + 5.5 * mm, self.header_title)
+        self.drawString(36 * mm, height - band + 5.5 * mm, self.header_title)
         self.setFillColor(CYAN)
         self.setFont(FONT_REGULAR, 7.8)
         self.drawRightString(width - 18 * mm, height - band + 5.5 * mm, CONFIDENTIAL_STAMP)
@@ -1093,11 +1128,14 @@ def _nivel_risco_geral(report: Dict[str, Any]) -> Tuple[str, List[str], int, int
 # --------------------------------------------------------------------------- #
 # Entrypoint Principal
 # --------------------------------------------------------------------------- #
-def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe de Segurança", watermark: Optional[str] = None) -> str:
+def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe de Segurança", watermark: Optional[str] = None, logo_path: Optional[str] = None) -> str:
     json_path = str(json_path)
     output_pdf_path = str(output_pdf_path)
     _register_unicode_fonts()
-    
+
+    resolved_logo = logo_path or resolve_brand_asset_path()
+    resolved_watermark = watermark or resolve_brand_asset_path()
+
     with open(json_path, "r", encoding="utf-8") as f:
         report = json.load(f)
 
@@ -1118,7 +1156,8 @@ def generate_pdf(json_path: str, output_pdf_path: str, analista: str = "Equipe d
     )
 
     canvas_maker = NumberedCanvas
-    canvas_maker.watermark_path = watermark or os.path.join("assets", "watermark.png")
+    canvas_maker.watermark_path = resolved_watermark
+    canvas_maker.logo_path = resolved_logo
     canvas_maker.header_subtitle = f"Alvo: {_target(report)}"
 
     template = PageTemplate(id="Executive", frames=frame)
