@@ -3,7 +3,7 @@ import importlib.util
 import urllib.parse
 import json
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from .utilidades import (
     Vulnerabilidade, PESO_SEVERIDADE, normalizar_lista, obter_logger,
@@ -103,7 +103,11 @@ def obter_ultimo_relatorio() -> Optional[Dict[str, object]]:
         with open(caminho, "r", encoding="utf-8") as f: return json.load(f)
     return None
 
-def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
+def gerar_relatorio(
+    vulns: List[Vulnerabilidade],
+    alvo: str,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, str]:
     carimbo = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     nome_base = f"relatorio_{carimbo}"
     caminho_json = os.path.join(DIR_RELATORIOS, nome_base + ".json")
@@ -120,6 +124,8 @@ def gerar_relatorio(vulns: List[Vulnerabilidade], alvo: str) -> Dict[str, str]:
         "metricas": metricas,
         "categorias": {cat: normalizar_lista(lst) for cat, lst in grupos.items()},
     }
+    if metadata:
+        payload.update(metadata)
     
     # Salvar JSONs (Histórico e Frontend)
     with open(caminho_json, "w", encoding="utf-8") as f:

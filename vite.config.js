@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000',
+          target: env.VITE_API_PROXY_TARGET || 'http://localhost:8000',
           changeOrigin: true,
           secure: true, // Em produção (HTTPS), melhor deixar como true
           rewrite: (path) => path.replace(/^\/api/, ''),

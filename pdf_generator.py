@@ -389,6 +389,27 @@ def parse_h8mail(tool: Dict[str, Any]) -> Tuple[str, List[str]]:
     return verdict, errors
 
 
+def parse_solana(tool: Dict[str, Any]) -> Dict[str, Any]:
+    data = tool.get("data") or {}
+    result = data.get("result") if isinstance(data, dict) else {}
+    if not isinstance(result, dict):
+        result = {}
+    sns = result.get("sns") if isinstance(result.get("sns"), dict) else {}
+    risk = result.get("risk") if isinstance(result.get("risk"), dict) else {}
+    return {
+        "target": result.get("target") or "n/d",
+        "target_type": result.get("target_type") or "n/d",
+        "wallet_address": result.get("wallet_address") or "n/d",
+        "sol_balance": result.get("sol_balance"),
+        "token_accounts": result.get("token_accounts") or [],
+        "sns": sns,
+        "flags": result.get("flags") or risk.get("flags") or [],
+        "risk": risk,
+        "errors": result.get("errors") or [],
+        "recent_signatures": result.get("recent_signatures") or [],
+    }
+
+
 def parse_failures(tool_name: str, tool: Dict[str, Any]) -> List[str]:
     data = tool.get("data") or {}
     messages: List[str] = []
@@ -876,6 +897,56 @@ def build_story(report: Dict[str, Any], styles: Dict[str, ParagraphStyle],
             f"contra <b>{escape(str(alvo))}</b>, totalizando <b>{len(findings)} achados técnicos</b>."
         )
     story.append(Paragraph(descricao, styles["body"]))
+
+    solana_tool = tools.get("solana", {}) or {}
+    if solana_tool:
+        solana_data = parse_solana(solana_tool)
+        risk = solana_data["risk"]
+        risk_level = risk.get("risk_level") or ("sinalizada" if solana_data["flags"] else "não sinalizada")
+        risk_score = risk.get("risk_score")
+        risk_summary = f"{risk_level} (score {risk_score})" if risk_score is not None else str(risk_level)
+        story.append(section("3A. Inteligência On-Chain Solana", styles))
+        story.append(kv_table([
+            ("Alvo on-chain", str(solana_data["wallet_address"] or solana_data["target"])),
+            ("Tipo de alvo", str(solana_data["target_type"])),
+            ("Saldo SOL", "n/d" if solana_data["sol_balance"] is None else f"{solana_data['sol_balance']:.9f}".rstrip("0").rstrip(".")),
+            ("SNS .sol", str((solana_data["sns"] or {}).get("resolved_address") or (solana_data["sns"] or {}).get("status") or "n/d")),
+            ("Risco / lista local", risk_summary),
+            ("Status da consulta", str(solana_tool.get("status", "unknown"))),
+            ("Assinaturas recentes", str(len(solana_data["recent_signatures"]))),
+        ], styles, width))
+        if solana_data["errors"]:
+            error_summary = "; ".join(str(error) for error in solana_data["errors"][:3])
+            story.append(Paragraph(
+                f"Cobertura parcial — alguns dados on-chain não puderam ser consultados: {_paragraph_text(error_summary)}",
+                styles["body"],
+            ))
+        if solana_data["token_accounts"]:
+            story.append(Paragraph("Tokens SPL encontrados", styles["h2"]))
+            token_head = ["Símbolo", "Mint", "Conta", "Quantidade"]
+            token_rows = [[Paragraph(f"<b>{h}</b>", styles["cellhead"]) for h in token_head]]
+            for token in solana_data["token_accounts"][:10]:
+                token_rows.append([
+                    Paragraph(_paragraph_text(token.get("symbol") or "n/d"), styles["small"]),
+                    Paragraph(_paragraph_text(token.get("mint") or "n/d"), styles["small"]),
+                    Paragraph(_paragraph_text(token.get("token_account") or "n/d"), styles["small"]),
+                    Paragraph(_paragraph_text(token.get("amount") or "0"), styles["small"]),
+                ])
+            token_table = Table(token_rows, colWidths=[0.13 * width, 0.31 * width, 0.34 * width, 0.22 * width], repeatRows=1)
+            token_table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("GRID", (0, 0), (-1, -1), 0.4, LINE),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [PAPER, ZEBRA]),
+            ]))
+            story.append(token_table)
+        if solana_data["flags"]:
+            story.append(Paragraph(
+                f"Carteira sinalizada por {len(solana_data['flags'])} regra(s) mock/estática(s) de sanções ou reputação.",
+                styles["body"],
+            ))
 
     # --- Seção 2: Matriz de Ferramentas ---
     category = _target_category(report)

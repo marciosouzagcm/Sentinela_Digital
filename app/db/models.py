@@ -17,14 +17,14 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     uuid: Mapped[str] = mapped_column(String(64), unique=True, default=lambda: str(uuid.uuid4()), index=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-    wallet: Mapped[str | None] = mapped_column(String(88), nullable=True, index=True)
+    wallet_address: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     auth_method: Mapped[str] = mapped_column(String(32), default="siws")
     total_credits: Mapped[int] = mapped_column(Integer, default=0)
     used_scans: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    metadata: Mapped[str | None] = mapped_column(Text, nullable=True)
+    user_metadata: Mapped[str | None] = mapped_column("metadata", Text, nullable=True)
 
 
 class PaymentTransaction(Base):
@@ -40,7 +40,7 @@ class PaymentTransaction(Base):
     currency: Mapped[str] = mapped_column(String(16), default="SOL")
     status: Mapped[str] = mapped_column(String(24), default="pending")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    metadata: Mapped[str | None] = mapped_column(Text, nullable=True)
+    user_metadata: Mapped[str | None] = mapped_column("metadata", Text, nullable=True)
 
 
 class ScanCreditLedger(Base):
@@ -53,4 +53,4 @@ class ScanCreditLedger(Base):
     delta: Mapped[int] = mapped_column(Integer, default=0)
     reason: Mapped[str] = mapped_column(String(64), default="manual")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    metadata: Mapped[str | None] = mapped_column(Text, nullable=True)
+    user_metadata: Mapped[str | None] = mapped_column("metadata", Text, nullable=True)
