@@ -60,6 +60,30 @@ class SolanaPaymentFlowTests(unittest.TestCase):
             )
         self.assertEqual(getattr(raised.exception, "status_code", None), 422)
 
+    def test_create_order_uses_valid_client_reference_and_rejects_hex_reference(self):
+        db = MagicMock()
+        with patch.object(solana_pay, "_payment_recipient", return_value=TREASURY):
+            response = solana_pay.create_order(
+                solana_pay.CreateOrderRequest(wallet_address=WALLET, reference=WALLET, target="alice.sol"),
+                db,
+            )
+
+        stored_order = db.add.call_args.args[0]
+        self.assertEqual(response.reference, WALLET)
+        self.assertIn(f"reference={WALLET}", response.payment_url)
+        self.assertEqual(stored_order.signature, WALLET)
+
+        with patch.object(solana_pay, "_payment_recipient", return_value=TREASURY):
+            with self.assertRaises(Exception) as raised:
+                solana_pay.create_order(
+                    solana_pay.CreateOrderRequest(
+                        wallet_address=WALLET,
+                        reference="91d4fbfa9f526804d2322abbac91f60a085094daf5e4",
+                    ),
+                    MagicMock(),
+                )
+        self.assertEqual(getattr(raised.exception, "status_code", None), 400)
+
     def test_rpc_urls_follow_selected_cluster_and_keep_public_fallback(self):
         with patch.dict(os.environ, {
             "SOLANA_ENV": "devnet",
@@ -221,6 +245,7 @@ class SolanaPaymentFlowTests(unittest.TestCase):
         order = SimpleNamespace(status="pending", user_metadata=json.dumps(metadata), amount_lamports=50_000_000)
         user = SimpleNamespace(uuid="user-uuid", total_credits=0)
         db = MagicMock()
+        db.query.return_value.filter.return_value.first.return_value = None
         background_tasks = BackgroundTasks()
         payload = solana_pay.VerifyPaymentRequest.model_validate({
             "reference": WALLET,
@@ -244,6 +269,54 @@ class SolanaPaymentFlowTests(unittest.TestCase):
         check_transaction.assert_called_once_with(
             "confirmed-transaction-signature", metadata, 50_000_000, expected_reference=WALLET
         )
+
+    def test_confirmed_payment_persists_pipeline_payment_record(self):
+        metadata = {
+            "wallet_address": WALLET,
+            "target": "alice.sol",
+            "recipient": TREASURY,
+            "scans_to_credit": 1,
+        }
+        order = SimpleNamespace(status="pending", user_metadata=json.dumps(metadata), amount_lamports=50_000_000)
+        user = SimpleNamespace(uuid="user-uuid", total_credits=0)
+        db = MagicMock()
+        db.query.return_value.filter.return_value.first.return_value = None
+        background_tasks = BackgroundTasks()
+        with (
+            patch.dict(os.environ, {"SOLANA_TREASURY_WALLET": TREASURY}),
+            patch.object(solana_pay, "_order_by_reference", return_value=order),
+            patch.object(solana_pay, "_signatures_for_reference", return_value=[{
+                "signature": "confirmed-signature", "confirmationStatus": "confirmed", "err": None,
+            }]),
+            patch.object(solana_pay, "_transaction_matches_order", return_value=True),
+            patch.object(solana_pay, "_user_by_wallet", return_value=user),
+        ):
+            solana_pay.verify_payment(
+                solana_pay.VerifyPaymentRequest(reference=WALLET, wallet_address=WALLET),
+                background_tasks,
+                db,
+            )
+
+        payment = next(item for item in (call.args[0] for call in db.add.call_args_list) if isinstance(item, solana_pay.Payment))
+        self.assertEqual(payment.reference_key, WALLET)
+        self.assertEqual(payment.tx_signature, "confirmed-signature")
+        self.assertEqual(payment.status, solana_pay.PaymentStatus.CONFIRMED)
+
+    def test_paid_worker_marks_failure_and_persists_error(self):
+        payment = SimpleNamespace(status=solana_pay.PaymentStatus.CONFIRMED, error_message=None, pdf_report_path=None)
+        db = MagicMock()
+        db.query.return_value.filter.return_value.first.return_value = payment
+
+        with (
+            patch.object(solana_pay, "SessionLocal", return_value=db),
+            patch.object(solana_pay, "generate_solana_report", side_effect=RuntimeError("nmap permission denied")),
+        ):
+            import asyncio
+
+            asyncio.run(solana_pay._run_paid_solana_scan("alice.sol", WALLET, "confirmed-signature"))
+
+        self.assertEqual(payment.status, solana_pay.PaymentStatus.FAILED)
+        self.assertIn("nmap permission denied", payment.error_message)
 
 
 if __name__ == "__main__":

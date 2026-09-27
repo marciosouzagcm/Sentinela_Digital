@@ -1,6 +1,10 @@
 import { useWallet } from '@solana/wallet-adapter-react';
+import { Keypair } from '@solana/web3.js';
 import { CheckCircle2, Copy, ExternalLink, Loader2, ScanLine, ShieldAlert } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 20;
 
 const getWalletAddress = (publicKey) => {
   try {
@@ -46,7 +50,13 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [txSignature, setTxSignature] = useState('');
+  const stopPollingRef = useRef(false);
+  const onVerifiedRef = useRef(onVerified);
   const isDemoEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_PAYMENT_DEMO === 'true';
+
+  useEffect(() => {
+    onVerifiedRef.current = onVerified;
+  }, [onVerified]);
 
   const paymentUrl = typeof order?.payment_url === 'string' ? order.payment_url : '';
 
@@ -58,7 +68,7 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
 
   useEffect(() => {
     try {
-      if (paymentStatus !== 'verified') return undefined;
+      if (!['verified', 'SCAN_IN_PROGRESS'].includes(paymentStatus)) return undefined;
       const interval = window.setInterval(() => {
         try {
           setScanProgress((current) => Math.min(current + 15, 100));
@@ -76,10 +86,20 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
 
   useEffect(() => {
     try {
-      if (typeof order?.reference !== 'string' || !order.reference || paymentStatus === 'verified') return undefined;
+      if (typeof order?.reference !== 'string' || !order.reference || stopPollingRef.current) return undefined;
+      let cancelled = false;
+      let timerId;
+      let attempts = 0;
       let pollInFlight = false;
       const poll = async () => {
-        if (pollInFlight) return;
+        if (cancelled || stopPollingRef.current || pollInFlight) return;
+        if (attempts >= MAX_POLL_ATTEMPTS) {
+          stopPollingRef.current = true;
+          setError('A verificação atingiu o limite de tentativas. Use “Verificar assinatura” ou gere uma nova cobrança.');
+          setPaymentStatus('error');
+          return;
+        }
+        attempts += 1;
         pollInFlight = true;
         try {
           const response = await fetch(`${apiBaseUrl}/api/v1/payments/verify-tx`, {
@@ -102,15 +122,28 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
             const detail = data?.detail || `HTTP ${response.status}`;
             console.error('[Solana Pay] Falha na verificação do pagamento:', detail);
             setError(`Não foi possível verificar o pagamento (${detail}). Verifique conexão, CORS e o backend.`);
+            if (response.status >= 400 && response.status < 500 && ![408, 429].includes(response.status)) {
+              stopPollingRef.current = true;
+              setPaymentStatus('error');
+              return;
+            }
             setPaymentStatus('pending');
+            return;
+          }
+
+          if (data?.status === 'error' && /reference inválida|publickey/i.test(String(data?.message || ''))) {
+            stopPollingRef.current = true;
+            setError(data.message);
+            setPaymentStatus('error');
             return;
           }
 
           setError('');
           if (isPaymentConfirmed(data?.status) || Number(data?.credits_added) > 0 || data?.confirmed === true || data?.paid === true) {
-            setPaymentStatus('verified');
+            stopPollingRef.current = true;
+            setPaymentStatus('SCAN_IN_PROGRESS');
             setScanProgress(35);
-            onVerified?.({ ...data, status: 'verified' });
+            onVerifiedRef.current?.({ ...data, status: 'SCAN_IN_PROGRESS' });
             return;
           }
 
@@ -123,17 +156,26 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
           setPaymentStatus('pending');
         } finally {
           pollInFlight = false;
+          if (!cancelled && !stopPollingRef.current && attempts >= MAX_POLL_ATTEMPTS) {
+            stopPollingRef.current = true;
+            setError('A verificação atingiu o limite de tentativas. Use “Verificar assinatura” ou gere uma nova cobrança.');
+            setPaymentStatus('error');
+          } else if (!cancelled && !stopPollingRef.current) {
+            timerId = window.setTimeout(() => void poll(), POLL_INTERVAL_MS);
+          }
         }
       };
 
       void poll();
-      const interval = window.setInterval(() => void poll(), 3000);
-      return () => window.clearInterval(interval);
+      return () => {
+        cancelled = true;
+        if (timerId !== undefined) window.clearTimeout(timerId);
+      };
     } catch (err) {
       console.error('PaymentCheckout Error:', err);
       return undefined;
     }
-  }, [apiBaseUrl, order, paymentStatus, publicKey, onVerified, txSignature]);
+  }, [apiBaseUrl, order?.reference, order?.wallet_address, order?.scans_to_credit, order?.amount_sol, publicKey, txSignature]);
 
   const handleCreateOrder = async () => {
     let controller;
@@ -151,6 +193,8 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
 
       console.log('Iniciando geração de cobrança...', target);
       setIsLoading(true);
+      stopPollingRef.current = false;
+      const referenceBase58 = Keypair.generate().publicKey.toBase58();
       controller = new AbortController();
       timeoutId = window.setTimeout(() => controller.abort(), 15000);
       const response = await fetch(`${apiBaseUrl}/api/v1/payments/create-order`, {
@@ -159,6 +203,7 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           wallet_address: publicKey.toBase58(),
+          reference: referenceBase58,
           amount_sol: Number(amountSol),
           scans_to_credit: Number(scansToCredit) || 1,
           target: target || null,
@@ -176,6 +221,9 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
       }
 
       const paymentData = normalizePaymentData(payload);
+      if (paymentData.reference !== referenceBase58) {
+        throw new Error('O backend retornou uma referência diferente da referência Base58 solicitada.');
+      }
       setOrder({
         ...paymentData,
         wallet_address: walletAddress,
@@ -232,10 +280,11 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
       });
       if (!response.ok) throw new Error(data?.detail || `HTTP ${response.status}`);
       if (isPaymentConfirmed(data?.status) || Number(data?.credits_added) > 0 || data?.confirmed === true || data?.paid === true) {
-        setPaymentStatus('verified');
-        setScanProgress(100);
+        stopPollingRef.current = true;
+        setPaymentStatus('SCAN_IN_PROGRESS');
+        setScanProgress(35);
         setError('');
-        onVerified?.({ ...data, status: 'verified' });
+        onVerifiedRef.current?.({ ...data, status: 'SCAN_IN_PROGRESS' });
       } else {
         setPaymentStatus(typeof data?.status === 'string' ? data.status : 'pending');
         setError(data?.message || 'A transação ainda não pôde ser confirmada.');
@@ -243,6 +292,10 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
     } catch (verifyError) {
       console.error('PaymentCheckout Error:', verifyError);
       const message = verifyError instanceof Error ? verifyError.message : 'Erro inesperado';
+      if (/reference inválida|publickey|HTTP 4\d\d/i.test(message)) {
+        stopPollingRef.current = true;
+        setPaymentStatus('error');
+      }
       console.error('[Solana Pay] Falha ao verificar assinatura informada:', verifyError);
       setError(`Falha ao verificar a assinatura: ${message}`);
     }
@@ -250,6 +303,7 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
 
   const handleDemoConfirmation = () => {
     try {
+      stopPollingRef.current = true;
       const simulatedPayment = {
         status: 'verified',
         credits_added: Number(order?.scans_to_credit) || 1,
@@ -364,7 +418,7 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Status da transação</p>
                   <p className={`mt-1 font-semibold ${paymentStatus === 'verified' ? 'text-emerald-300' : 'text-violet-200'}`}>
-                    {paymentStatus === 'verified' ? 'Pagamento confirmado' : paymentStatus === 'pending' ? 'Aguardando confirmação on-chain…' : paymentStatus}
+                    {paymentStatus === 'verified' ? 'Pagamento confirmado' : paymentStatus === 'SCAN_IN_PROGRESS' ? 'Pagamento confirmado · varredura em andamento…' : paymentStatus === 'pending' ? 'Aguardando confirmação on-chain…' : paymentStatus}
                   </p>
                 </div>
                 {paymentStatus === 'verified' ? <CheckCircle2 className="h-5 w-5 text-emerald-300" /> : <Loader2 className="h-5 w-5 animate-spin text-violet-300" />}
@@ -372,7 +426,7 @@ const PaymentCheckout = ({ apiBaseUrl, onVerified }) => {
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-valuenow={scanProgress} aria-valuemin="0" aria-valuemax="100">
                 <div className="h-full rounded-full bg-gradient-to-r from-violet-400 to-emerald-300 transition-all" style={{ width: `${scanProgress}%` }} />
               </div>
-              <p className="mt-2 text-right text-xs text-slate-500">Verificação automática a cada 3 segundos</p>
+              <p className="mt-2 text-right text-xs text-slate-500">Verificação a cada 3 s, até 20 tentativas</p>
             </div>
 
             <div className="space-y-2 rounded-xl border border-white/10 bg-slate-950/60 p-4 text-sm">

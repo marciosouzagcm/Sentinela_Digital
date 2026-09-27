@@ -180,7 +180,7 @@ function AppShell() {
       setScanNotice(`DEMO local: ${payment?.credits_added || 0} crédito(s) simulado(s); nenhum crédito real foi liberado.`);
       return;
     }
-    setScanNotice(`Pagamento confirmado: ${payment?.credits_added || 0} crédito(s) liberado(s).`);
+    setScanNotice(`Pagamento confirmado: ${payment?.credits_added || 0} crédito(s) liberado(s). Varredura iniciada.`);
   }, []);
 
   return (

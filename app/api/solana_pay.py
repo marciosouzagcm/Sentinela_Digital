@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
@@ -11,8 +13,8 @@ from pydantic import AliasChoices, BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
-from app.db.models import PaymentTransaction, ScanCreditLedger, User
+from app.db.database import SessionLocal, get_db
+from app.db.models import Payment, PaymentStatus, PaymentTransaction, ScanCreditLedger, User
 from app.services.mod_solana import is_solana_address
 from app.services.solana_reporting import generate_solana_report
 
@@ -25,6 +27,7 @@ except Exception:  # pragma: no cover
         Pubkey = None  # type: ignore
 
 router = APIRouter(prefix="/api/v1")
+logger = logging.getLogger("sentinela")
 
 DEFAULT_AMOUNT_SOL = float(os.getenv("SOLANA_PAY_DEFAULT_AMOUNT_SOL", "0.05"))
 NONCE_TTL_SECONDS = 300
@@ -32,6 +35,7 @@ NONCE_TTL_SECONDS = 300
 
 class CreateOrderRequest(BaseModel):
     wallet_address: str = Field(..., min_length=32, max_length=88)
+    reference: str | None = Field(default=None, min_length=32, max_length=44)
     amount_sol: float = Field(default=DEFAULT_AMOUNT_SOL, gt=0)
     scans_to_credit: int = Field(default=1, ge=1)
     target: str | None = Field(default=None, max_length=255)
@@ -70,13 +74,13 @@ class VerifyPaymentResponse(BaseModel):
 
 def _make_reference() -> str:
     if Pubkey is None:
-        return os.urandom(32).hex()[:44]
+        raise RuntimeError("Uma biblioteca Solana compatível é necessária para gerar uma referência Base58 válida.")
     seed = os.urandom(32)
     if hasattr(Pubkey, "from_bytes"):
         return str(Pubkey.from_bytes(seed))
     if hasattr(Pubkey, "new_unique"):
         return str(Pubkey.new_unique())
-    return os.urandom(32).hex()[:44]
+    raise RuntimeError("Não foi possível gerar uma referência Solana válida.")
 
 
 def _is_pubkey(value: str | None) -> bool:
@@ -238,22 +242,51 @@ def _signature_is_confirmed(signature: str) -> bool:
     return values[0].get("err") is None and confirmation in {"confirmed", "finalized"}
 
 
+def _payment_by_signature(db: Session, signature: str) -> Payment | None:
+    payment = db.query(Payment).filter(Payment.tx_signature == signature).first()
+    return payment
+
+
+def _payment_by_reference(db: Session, reference: str) -> Payment | None:
+    payment = db.query(Payment).filter(Payment.reference_key == reference).first()
+    return payment
+
+
 async def _run_paid_solana_scan(target: str, reference: str, signature: str) -> None:
+    db = SessionLocal()
+    payment = _payment_by_signature(db, signature)
+    if payment is None:
+        db.close()
+        return
+
     try:
-        await generate_solana_report(
+        payment.status = PaymentStatus.SCAN_IN_PROGRESS
+        payment.error_message = None
+        db.commit()
+        report = await generate_solana_report(
             target,
             payment={"reference": reference, "signature": signature},
         )
-    except Exception:
-        import logging
-
-        logging.getLogger("sentinela").exception("Varredura Solana pós-pagamento falhou para referência %s.", reference)
+        if report.get("pdf_error"):
+            raise RuntimeError(f"geração de PDF falhou: {report['pdf_error']}")
+        payment.status = PaymentStatus.COMPLETED
+        payment.pdf_report_path = report.get("pdf")
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        payment = _payment_by_signature(db, signature)
+        if payment is not None:
+            payment.status = PaymentStatus.FAILED
+            payment.error_message = f"{type(exc).__name__}: {exc}"[:4000]
+            db.commit()
+        logger.exception("Varredura Solana pós-pagamento falhou para referência %s.", reference)
+    finally:
+        db.close()
 
 
 @router.post("/payments/create-order", response_model=CreateOrderResponse)
 def create_order(payload: CreateOrderRequest, db: Session = Depends(get_db)) -> CreateOrderResponse:
     recipient = _payment_recipient()
-    reference = _make_reference()
     label = "Sentinela Digital"
     wallet_address = payload.wallet_address.strip()
     if not _is_pubkey(wallet_address):
@@ -261,6 +294,9 @@ def create_order(payload: CreateOrderRequest, db: Session = Depends(get_db)) -> 
     target = payload.target.strip() if payload.target else None
     if payload.target is not None and (not target or any(ord(character) < 32 for character in target)):
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="target deve ser um texto válido de até 255 caracteres.")
+    reference = payload.reference.strip() if payload.reference else _make_reference()
+    if not _is_pubkey(reference):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="reference deve ser uma PublicKey Solana Base58 válida.")
     payment_url = _payment_url(
         recipient=recipient,
         amount_sol=payload.amount_sol,
@@ -451,6 +487,27 @@ def verify_payment(
         )
     )
 
+    target = order_metadata.get("target")
+    payment = _payment_by_signature(db, confirmed_signature) or _payment_by_reference(db, reference)
+    if payment is None:
+        payment = Payment(
+            id=str(uuid.uuid4()),
+            user_wallet=wallet_address,
+            tx_signature=confirmed_signature,
+            reference_key=reference,
+            target_host=(target.strip() if isinstance(target, str) and target.strip() else reference),
+            amount_sol=order.amount_lamports / 1_000_000_000,
+            status=PaymentStatus.CONFIRMED,
+        )
+        db.add(payment)
+        can_schedule = True
+    else:
+        can_schedule = payment.status not in {PaymentStatus.SCAN_IN_PROGRESS, PaymentStatus.COMPLETED}
+        payment.tx_signature = confirmed_signature
+        payment.user_wallet = wallet_address
+        payment.amount_sol = order.amount_lamports / 1_000_000_000
+        payment.status = PaymentStatus.CONFIRMED
+
     order.status = "verified"
     order.user_metadata = json.dumps(
         {
@@ -465,8 +522,8 @@ def verify_payment(
     )
     db.commit()
 
-    target = order_metadata.get("target")
-    if isinstance(target, str) and target.strip():
+    should_schedule = isinstance(target, str) and bool(target.strip())
+    if should_schedule and can_schedule:
         background_tasks.add_task(_run_paid_solana_scan, target.strip(), reference, confirmed_signature)
 
     return VerifyPaymentResponse(

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import uuid
+import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Enum, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.database import Base
@@ -41,6 +42,34 @@ class PaymentTransaction(Base):
     status: Mapped[str] = mapped_column(String(24), default="pending")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     user_metadata: Mapped[str | None] = mapped_column("metadata", Text, nullable=True)
+
+
+class PaymentStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    FAILED = "FAILED"
+    SCAN_IN_PROGRESS = "SCAN_IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+
+class Payment(Base):
+    """Tracks the idempotent post-payment scan and report lifecycle."""
+
+    __tablename__ = "payments"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_wallet: Mapped[str] = mapped_column(String(44), nullable=False, index=True)
+    tx_signature: Mapped[str | None] = mapped_column(String(88), unique=True, nullable=True, index=True)
+    reference_key: Mapped[str] = mapped_column(String(44), unique=True, nullable=False, index=True)
+    target_host: Mapped[str] = mapped_column(String(255), nullable=False)
+    amount_sol: Mapped[float] = mapped_column(Float, nullable=False)
+    status: Mapped[PaymentStatus] = mapped_column(
+        Enum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False
+    )
+    pdf_report_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class ScanCreditLedger(Base):

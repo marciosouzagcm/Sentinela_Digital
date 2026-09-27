@@ -51,7 +51,7 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, futu
 
 def init_db() -> None:
     """Create all tables defined by SQLAlchemy models in the application."""
-    from app.db.models import PaymentTransaction, ScanCreditLedger, User  # type: ignore  # noqa: F401
+    from app.db.models import Payment, PaymentTransaction, ScanCreditLedger, User  # type: ignore  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
 
